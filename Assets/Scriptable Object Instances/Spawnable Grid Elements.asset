@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f85f6474d0c55a4cadd93d1ad8f5938, type: 3}
+  m_Name: Spawnable Grid Elements
+  m_EditorClassIdentifier: 
+  gridElementsList:
+  - elementPrefab: {fileID: 1448221095837206520, guid: 5f4873677047b73408aedee5eb0ae6f4,
+      type: 3}
+  - elementPrefab: {fileID: 975592408743132416, guid: 19269422f43cd6f4d929ccc1b7cf1b51,
+      type: 3}
+  - elementPrefab: {fileID: 8965983904575579964, guid: fd983adbcf71b9d4d895fcc3cf30d5f9,
+      type: 3}
+  - elementPrefab: {fileID: 6540156129482942748, guid: 94e404f03dcce38428ffa28d2c7e63dc,
+      type: 3}
+  - elementPrefab: {fileID: 1298218632145433411, guid: f658d62d9f5ec574b95b6b09baf62095,
+      type: 3}
