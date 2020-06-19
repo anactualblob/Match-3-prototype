@@ -683,6 +683,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533906029}
   m_CullTransparentMesh: 0
+--- !u!1 &1771221475
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1771221476}
+  m_Layer: 0
+  m_Name: PoolContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1771221476
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771221475}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2079895464}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1957914193
 GameObject:
   m_ObjectHideFlags: 0
@@ -845,8 +875,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelJSON: {fileID: 0}
-  gridHeight: 5
-  gridWidth: 5
+  gridHeight: 15
+  gridWidth: 10
 --- !u!4 &2079895464
 Transform:
   m_ObjectHideFlags: 0
@@ -861,6 +891,7 @@ Transform:
   - {fileID: 569954228}
   - {fileID: 1957914194}
   - {fileID: 1233053810}
+  - {fileID: 1771221476}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -876,7 +907,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48ed7a1af75ec1845bd785e8caac6771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verticalMargin: 0
-  horizontalMargin: 0
+  verticalMargin: 0.2
+  horizontalMargin: 0.2
   offsetFromCenter: {x: 0, y: 0}
-  gridCellBackgroundPrefab: {fileID: 0}
+  gridCellBackgroundPrefab: {fileID: 6304080904323656463, guid: 32f4be82085d5c04f8fdf2cc8bc6253e,
+    type: 3}
+  candyBlue: {fileID: 1448221095837206520, guid: 5f4873677047b73408aedee5eb0ae6f4,
+    type: 3}
+  candyRed: {fileID: 6540156129482942748, guid: 94e404f03dcce38428ffa28d2c7e63dc,
+    type: 3}
+  candyOrange: {fileID: 8965983904575579964, guid: fd983adbcf71b9d4d895fcc3cf30d5f9,
+    type: 3}
+  candyYellow: {fileID: 1298218632145433411, guid: f658d62d9f5ec574b95b6b09baf62095,
+    type: 3}
+  candyGreen: {fileID: 975592408743132416, guid: 19269422f43cd6f4d929ccc1b7cf1b51,
+    type: 3}
+  totalCellsToPoolCandiesRatio: 0.4
