@@ -60,20 +60,6 @@ public class GridManager : MonoBehaviour
 
 
 
-    //[Header("Grid Display")]
-    //[SerializeField] float verticalMargin;
-    //[SerializeField] float horizontalMargin;
-    //[SerializeField] Vector2 offsetFromCenter;
-    //float cellSize = 1;
-
-    //[Space]
-    //[SerializeField] GameObject gridCellBackgroundPrefab;
-    //[SerializeField] SpawnableGridElementsScriptableObject spawnableGridElements;
-
-    //SpriteRenderer gridBackgroundSprite;
-    //Transform cellContainer;
-    //Transform gridElementContainer;
-
     private void Awake()
     {
         //Singleton initialization
@@ -81,22 +67,6 @@ public class GridManager : MonoBehaviour
     }
     private void Start()
     {
-
-
-        // Check that nothing important is null
-        //gridBackgroundSprite = transform.Find("GridBackground").GetComponent<SpriteRenderer>();
-        //if (gridBackgroundSprite == null) Debug.LogError("GridManager.cs : gridBackgroundSprite couldn't be found. Is there a SpriteRenderer on a child of this object?");
-        //
-        //cellContainer = transform.Find("CellContainer");
-        //if (cellContainer == null) Debug.LogError("GridManager.cs : GridContainer object couldn't be found in children of this object.");
-        //
-        //gridElementContainer = transform.Find("GridElementContainer");
-        //if (gridElementContainer == null) Debug.LogError("GridManager.cs : GridElementContainer object couldn't be found in children of this object.");
-        //
-        //if (gridCellBackgroundPrefab == null) Debug.LogError("GridManager.cs : The grid cell prefab is null. Has it been assigned in the inspector?");
-        ////if (spawnableGridElements == null) Debug.LogError("GridManager.cs : The spawnableGridElements scriptable object is null. Has it been assigned in the inspector?");
-
-
 
         // grid initialization
         SetupGrid();
@@ -146,8 +116,7 @@ public class GridManager : MonoBehaviour
     [ContextMenu("Initialize Grid")]
     public void SetupGrid()
     {
-        //tear down current grid first
-        TeardownGrid();
+        EmptyCellContents();
 
         grid = new GridCell[GRID_WIDTH, GRID_HEIGHT];
 
@@ -164,7 +133,6 @@ public class GridManager : MonoBehaviour
 
                 // FIND A BETTER WAY TO DO THIS
                 grid[i, j].cellContent = (CellContents)Random.Range(1, 6); 
-
             }
         }
 
@@ -172,11 +140,6 @@ public class GridManager : MonoBehaviour
 
     }
 
-
-    public void TeardownGrid()
-    {
-        grid = new GridCell[GRID_WIDTH, GRID_HEIGHT];
-    }
 
     public void EmptyCellContents()
     {
@@ -320,13 +283,13 @@ public class GridManager : MonoBehaviour
 
     public enum CellContents
     {
-        hole    = -1,
-        empty   = 0,
-        candy_blue      = 1,
-        candy_red       = 2,
-        candy_green     = 3,
-        candy_orange    = 4,
-        candy_yellow    = 5
+        hole = -1,
+        empty = 0,
+        candy_blue = 1,
+        candy_red = 2,
+        candy_green = 3,
+        candy_orange = 4,
+        candy_yellow = 5
     }
 
     public struct TouchInfo

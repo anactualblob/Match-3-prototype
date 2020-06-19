@@ -271,7 +271,5 @@ public class GridDisplayer : MonoBehaviour
 
     }
 
-
-
     #endregion
 }
