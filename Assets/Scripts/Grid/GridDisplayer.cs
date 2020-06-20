@@ -76,21 +76,21 @@ public class GridDisplayer : MonoBehaviour
         if (gridCellBackgroundPrefab == null) Debug.LogError("GridDisplayer.cs : The grid cell prefab is null. Has it been assigned in the inspector?");
         //if (spawnableGridElements == null) Debug.LogError("GridManager.cs : The spawnableGridElements scriptable object is null. Has it been assigned in the inspector?");
 
-
         // Object Pools initialization
         numberOfPooledCandies = Mathf.RoundToInt((GridManager.GRID_HEIGHT * GridManager.GRID_WIDTH) * totalCellsToPoolCandiesRatio);
-        
+
         redCandyPool = new CandyPool(candyRed, numberOfPooledCandies, poolContainer);
         blueCandyPool = new CandyPool(candyBlue, numberOfPooledCandies, poolContainer);
         orangeCandyPool = new CandyPool(candyOrange, numberOfPooledCandies, poolContainer);
         greenCandyPool = new CandyPool(candyGreen, numberOfPooledCandies, poolContainer);
         yellowCandyPool = new CandyPool(candyYellow, numberOfPooledCandies, poolContainer);
+
     }
 
 
     private void Start()
     {
-
+        
     }
 
     public void GridDisplayInit()
@@ -147,6 +147,13 @@ public class GridDisplayer : MonoBehaviour
                 {
                     current.transform.position = GridToWorld(i, j);
                     current.transform.rotation = Quaternion.identity;
+
+                    GridElement gridElementComponent = current.GetComponent<GridElement>();
+                    GridManager.GRID[i, j].Swap += gridElementComponent.OnSwap;
+                    GridManager.GRID[i, j].Pop += gridElementComponent.OnPop;
+
+                    gridElementComponent.x = i;
+                    gridElementComponent.y = j;
                 }
             }
         }
@@ -157,8 +164,6 @@ public class GridDisplayer : MonoBehaviour
     {
         S.GridDisplayInit();
     }
-
-
 
 
 
@@ -255,8 +260,7 @@ public class GridDisplayer : MonoBehaviour
 
             return ret;
         }
-
-
+        
         /// <summary>
         /// Return an object to the pool, making it available again. Resets its parent transform and deactivates it.
         /// </summary>

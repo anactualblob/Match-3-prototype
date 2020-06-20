@@ -29,9 +29,9 @@ public class GridManager : MonoBehaviour
 
     TouchInfo primaryTouchInfo;
 
-    GridCell selectedCell;
+    Vector2Int selectedCell;
     bool cellSelected;
-    GridCell swipedCell;
+    Vector2Int swipedCell;
     bool shouldGetSwipedCell = false;
 
     
@@ -65,9 +65,9 @@ public class GridManager : MonoBehaviour
         //Singleton initialization
         S = this;
     }
+
     private void Start()
     {
-
         // grid initialization
         SetupGrid();
 
@@ -78,15 +78,23 @@ public class GridManager : MonoBehaviour
 
     private void Update()
     {
+        if (!primaryTouchInfo.touching)
+        {
+            //swipedCell = null;
+            //selectedCell = null;
+        }
+
         if (primaryTouchInfo.touching && !cellSelected)
         {
             if (primaryTouchInfo.startGridPosition != new Vector2Int(int.MinValue, int.MinValue)) // grid position is (minvalue, minvalue) when outside the grid
             {
-                selectedCell = grid[primaryTouchInfo.startGridPosition.x, primaryTouchInfo.startGridPosition.y];
+                selectedCell = primaryTouchInfo.startGridPosition;
+                Debug.Log(grid[selectedCell.x, selectedCell.y].cellContent);
             }
 
             cellSelected = true;
         }
+
         if (!primaryTouchInfo.touching && cellSelected)
         {
             cellSelected = false;
@@ -101,9 +109,31 @@ public class GridManager : MonoBehaviour
 
                 if (x < GRID_WIDTH && y < GRID_HEIGHT && x >= 0 && y >= 0)
                 {
-                    swipedCell = grid[x, y];
+                    // the cell the player is swiping
+                    swipedCell = new Vector2Int(x,y);
 
-                    
+                    // swap the cellContent variables of the cells being swapped
+                    CellContents temp = grid[swipedCell.x, swipedCell.y].cellContent;
+                    grid[swipedCell.x, swipedCell.y].cellContent = grid[selectedCell.x, selectedCell.y].cellContent;
+                    grid[selectedCell.x, selectedCell.y].cellContent = temp;
+
+
+                    // this is kind of a hack :
+                    // Basically, when a GridElement swaps, it deregisters its swap method from its 
+                    //    current cell and registers it on the new cell. however, since the new 
+                    //    cell's swap method gets called right after, the first GridElement's swap 
+                    //    method was being called twice. 
+                    //    We "solve" this by taking a "snapshot" of the swiped gridcell before the 
+                    //    first GridElement registers its swap method on it, and calling the swap
+                    //    method of this "snapshot". The first GridElement's swap method is only 
+                    //    called once and still registers itself on the right cell.
+                    GridCell swipedCellCopy = grid[swipedCell.x, swipedCell.y];
+
+                    if (grid[selectedCell.x, selectedCell.y].Swap != null)
+                        grid[selectedCell.x, selectedCell.y].Swap(new Vector2Int(swipedCell.x, swipedCell.y));
+
+                    if (swipedCellCopy.Swap != null)
+                        swipedCellCopy.Swap(new Vector2Int(selectedCell.x, selectedCell.y));
 
 
                 }
@@ -125,14 +155,25 @@ public class GridManager : MonoBehaviour
         {
             for (int j = 0; j < GRID_HEIGHT; ++j)
             {
-                // set grid cell struct
-                grid[i, j].visible = true;
-                grid[i, j].empty = false;
-                grid[i, j].x = i;
-                grid[i, j].y = j;
+                grid[i, j] = new GridCell()
+                {
+                    visible = true,
+                    empty = false,
+                    x = i,
+                    y = j,
 
-                // FIND A BETTER WAY TO DO THIS
-                grid[i, j].cellContent = (CellContents)Random.Range(1, 6); 
+                    // FIND A BETTER WAY TO DO THIS
+                    cellContent = (CellContents)Random.Range(1, 6)
+                };
+
+                //// set grid cell values
+                //grid[i, j].visible = true;
+                //grid[i, j].empty = false;
+                //grid[i, j].x = i;
+                //grid[i, j].y = j;
+                //
+                //// FIND A BETTER WAY TO DO THIS
+                //grid[i, j].cellContent = (CellContents)Random.Range(1, 6); 
             }
         }
 
@@ -273,12 +314,33 @@ public class GridManager : MonoBehaviour
     {
         public int x, y;
 
+        /// <summary>
+        /// [possibly deprecated] Whether or not this cell is part of the grid and can contain something.
+        /// </summary>
         [HideInInspector]
         public bool visible;
+
+        /// <summary>
+        /// Whether or not this cell currently contains anything.
+        /// </summary>
         [HideInInspector]
         public bool empty;
 
-        public CellContents cellContent;        
+
+        public CellContents cellContent;
+
+        public delegate void SwapDelegate(Vector2Int newCellPos);
+        public delegate void PopDelegate();
+
+        /// <summary>
+        /// Call this when this cell's content is being swapped with another.
+        /// </summary>
+        public SwapDelegate Swap;
+
+        /// <summary>
+        /// Call this when this cell's content are being "popped", eg when a match is made.
+        /// </summary>
+        public PopDelegate Pop;
     }
 
     public enum CellContents
@@ -291,6 +353,7 @@ public class GridManager : MonoBehaviour
         candy_orange = 4,
         candy_yellow = 5
     }
+
 
     public struct TouchInfo
     {
@@ -306,6 +369,8 @@ public class GridManager : MonoBehaviour
         {
             get 
             {
+                // find better way to get the swipe direction
+                // this is based soleley on angle and it's not ideal
                 Vector2 dir = (worldPosition - startWorldposition).normalized;
                 return new Vector2Int(Mathf.RoundToInt(dir.x), Mathf.RoundToInt(dir.y)) ;
             }

@@ -4,10 +4,28 @@ using UnityEngine;
 
 public abstract class GridElement : MonoBehaviour
 {
-    int x, y;
+    /// <summary>
+    /// x position of the GridElement in the grid.
+    /// </summary>
+    public int x;
 
-    public abstract void FetchPositionFromGridManager();
+    /// <summary>
+    /// y position of the GridElement in the grid.
+    /// </summary>
+    public int y;
 
-    public abstract void SetPosition(Vector2 worldPos);
+    /// <summary>
+    /// Called when the cell this GridElement is in is swapped with another.
+    /// </summary>
+    /// <param name="newCellPos">The position of the cell this GridElement is being swapped with.</param>
+    public abstract void OnSwap(Vector2Int newCellPos);
 
+    /// <summary>
+    /// Called when this GridElement must disappear from the grid, e.g. when a match is made.
+    /// </summary>
+    public abstract void OnPop();
+
+
+
+    
 }
