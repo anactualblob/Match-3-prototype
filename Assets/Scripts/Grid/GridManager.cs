@@ -79,21 +79,15 @@ public class GridManager : MonoBehaviour
 
     private void Update()
     {
-        if (!primaryTouchInfo.touching)
-        {
-            //swipedCell = null;
-            //selectedCell = null;
-        }
-
         if (primaryTouchInfo.touching && !cellSelected)
         {
-            if (primaryTouchInfo.startGridPosition != new Vector2Int(int.MinValue, int.MinValue)) // grid position is (minvalue, minvalue) when outside the grid
+            // user is touching inside the grid
+            if (primaryTouchInfo.startGridPosition != new Vector2Int(int.MinValue, int.MinValue)) 
             {
                 selectedCell = primaryTouchInfo.startGridPosition;
+                cellSelected = true;
                 //Debug.Log(grid[selectedCell.x, selectedCell.y].cellContent);
             }
-
-            cellSelected = true;
         }
 
         if (!primaryTouchInfo.touching && cellSelected)
@@ -103,11 +97,13 @@ public class GridManager : MonoBehaviour
 
         if(shouldGetSwipedCell)
         {
+            // user has touched inside the grid
             if (primaryTouchInfo.startGridPosition != new Vector2Int(int.MinValue, int.MinValue))
             {
                 int x = primaryTouchInfo.startGridPosition.x + primaryTouchInfo.swipeDirection.x;
                 int y = primaryTouchInfo.startGridPosition.y - primaryTouchInfo.swipeDirection.y;
 
+                // user is swiping inside the grid
                 if (x < GRID_WIDTH && y < GRID_HEIGHT && x >= 0 && y >= 0)
                 {
                     // the cell the player is swiping
@@ -118,10 +114,13 @@ public class GridManager : MonoBehaviour
                     grid[swipedCell.x, swipedCell.y].cellContent = grid[selectedCell.x, selectedCell.y].cellContent;
                     grid[selectedCell.x, selectedCell.y].cellContent = temp;
 
-
-                    if (GetMatchesAtCell(swipedCell).Count != 0 || GetMatchesAtCell(selectedCell).Count != 0)
+                    // check for matches
+                    List<Vector2Int> matches = new List<Vector2Int>();
+                    matches.AddRange(GetMatchesAtCell(swipedCell));
+                    matches.AddRange(GetMatchesAtCell(selectedCell));
+                    
+                    if (matches.Count != 0)
                     {
-
                         // this is kind of a hack :
                         // Basically, when a GridElement swaps, it deregisters its swap method from its 
                         //    current cell and registers it on the new cell. however, since the new 
@@ -134,20 +133,38 @@ public class GridManager : MonoBehaviour
                         GridCell swipedCellCopy = grid[swipedCell.x, swipedCell.y];
 
                         if (grid[selectedCell.x, selectedCell.y].Swap != null)
-                            grid[selectedCell.x, selectedCell.y].Swap(new Vector2Int(swipedCell.x, swipedCell.y));
+                            grid[selectedCell.x, selectedCell.y].Swap(swipedCell);
 
                         if (swipedCellCopy.Swap != null)
-                            swipedCellCopy.Swap(new Vector2Int(selectedCell.x, selectedCell.y));
+                            swipedCellCopy.Swap(selectedCell);
+
+                        foreach (Vector2Int cell in matches)
+                        {
+                            if (grid[cell.x, cell.y].Pop != null)
+                                grid[cell.x, cell.y].Pop();
+                        }
+
                     }
                     else
                     {
-                        // call swap fail event (also create a swap fail event)
+                        // call swap fail event (no need for the above hack since GridElement_Candy's 
+                        //    SwapFail method doesn't do any registering/deregistering)
+                        if (grid[selectedCell.x, selectedCell.y].SwapFail != null)
+                            grid[selectedCell.x, selectedCell.y].SwapFail(swipedCell);
+
+                        if (grid[swipedCell.x, swipedCell.y].SwapFail != null)
+                            grid[swipedCell.x, swipedCell.y].SwapFail(selectedCell);
+
 
                         // swap cell contents back
                         CellContents temp2 = grid[swipedCell.x, swipedCell.y].cellContent;
                         grid[swipedCell.x, swipedCell.y].cellContent = grid[selectedCell.x, selectedCell.y].cellContent;
                         grid[selectedCell.x, selectedCell.y].cellContent = temp2;
                     }
+
+
+
+                    
 
                 }
             }
@@ -166,20 +183,38 @@ public class GridManager : MonoBehaviour
             Vector2Int.left
         };
 
+        Vector2Int[,] directionalMatches = new Vector2Int[4, 2];
+        
+        for (int i = 0; i < 4; ++i)
+            for (int j = 0; j<2; ++j)
+                directionalMatches[i, j] = new Vector2Int(-1, -1);
+
+        //bool match4 = false;
+        //bool match5 = false;
+
+
         List<Vector2Int> matches = new List<Vector2Int>();
 
+        // find matches of type XOO
         for (int i = 0; i<directions.Length; ++i)
         {
             if (cell.x + directions[i].x >= GRID_WIDTH || cell.x + directions[i].x < 0 || cell.y + directions[i].y >= GRID_HEIGHT || cell.y + directions[i].y < 0)
             {
+                // if the cell we need to check is outside the grid, skip to the next loop iteration
                 continue;
             }
+
             GridCell checkedCell = grid[cell.x + directions[i].x, cell.y + directions[i].y];
 
             if (cell.cellContent == checkedCell.cellContent)
             {
+
+                // fill directionalMatches array in order to check for matches of type OXO
+                directionalMatches[i, 0] = new Vector2Int(checkedCell.x, checkedCell.y);
+
                 if (checkedCell.x + directions[i].x >= GRID_WIDTH || checkedCell.x + directions[i].x < 0 || checkedCell.y + directions[i].y >= GRID_HEIGHT || checkedCell.y + directions[i].y < 0)
                 {
+                    // if the cell we need to check is outside the grid, skip to the next loop iteration
                     continue;
                 }
 
@@ -189,9 +224,75 @@ public class GridManager : MonoBehaviour
                     matches.Add(new Vector2Int(cell.x, cell.y));
                     matches.Add(new Vector2Int(checkedCell.x, checkedCell.y));
                     matches.Add(new Vector2Int(thirdCell.x, thirdCell.y));
+
+                    // fill directionalMatches array in order to check for matches of type OXO
+                    directionalMatches[i, 1] = new Vector2Int(thirdCell.x, thirdCell.y);
                 }
             }
         }
+
+
+
+        // Find matches of type OXO
+        // The way this works is that we've populated a directionnalMatches array of 4 rows & 2 columns in the code above. 
+        // Each row corresponds to a direction, in the order Up Right Down Left. We check if we stored a match by comparing
+        //    an item of the array to a (-1,-1) vector, which we filled the array with after having created it. If it's not
+        //    (-1,-1), the item is a match because it has overwritten the default (-1,-1).
+        // So we first check if the first items of rows 0 and 2 (directions up and down) are both a match. If yes, that means
+        //    it's a match 3 and we add both items + the original cell we're checking to the list of matches (we need to add 
+        //    the OG cell because this match wasn't caught by the block above). Then, we check the second items of each row,
+        //    because if they're a match then it's a match 4 (or 5 if they're both matches). We add the items to the matches
+        //    list accordingly.
+        // This makes it so that we can detect both OXO matches, and matches of more than 3. I could maybe have optimized it
+        //    or wrapped it in a loop or have thought up a better algorithm, but this works so eh ¯\_(ツ)_/¯
+        // Also we do the same again further below but for rows 1 and 3, directions right and left.
+        Vector2Int noMatch = new Vector2Int(-1, -1);
+
+        if (directionalMatches[0,0] != noMatch && directionalMatches[2,0] != noMatch)
+        {
+            if (!matches.Contains(directionalMatches[0, 0])) matches.Add(directionalMatches[0, 0]);
+            if (!matches.Contains(directionalMatches[2, 0])) matches.Add(directionalMatches[2, 0]);
+            if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
+
+            if (directionalMatches[0,1] != noMatch)
+            {
+                //match4 = true;
+                if (!matches.Contains(directionalMatches[0, 1])) matches.Add(directionalMatches[0, 1]);
+            }
+
+            if (directionalMatches[2,1] != noMatch)
+            {
+                //if (match4) match5 = true;
+                //else match4 = true;
+
+                if (!matches.Contains(directionalMatches[2, 1])) matches.Add(directionalMatches[2, 1]);
+            }
+        }
+
+
+        if (directionalMatches[1, 0] != noMatch && directionalMatches[3, 0] != noMatch)
+        {
+            if (!matches.Contains(directionalMatches[1, 0])) matches.Add(directionalMatches[1, 0]);
+            if (!matches.Contains(directionalMatches[3, 0])) matches.Add(directionalMatches[3, 0]);
+            if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
+
+            if (directionalMatches[1, 1] != noMatch)
+            {
+                //match4 = true;
+                if (!matches.Contains(directionalMatches[1, 1])) matches.Add(directionalMatches[1, 1]);
+            }
+
+            if (directionalMatches[2, 1] != noMatch)
+            {
+                //if (match4) match5 = true;
+                //else match4 = true;
+
+                if (!matches.Contains(directionalMatches[3, 1])) matches.Add(directionalMatches[3, 1]);
+            }
+        }
+
+        // i know the code above is terrible it works don't @ me 
+        // also TODO find a way to use match4 and match5 ?
 
         return matches;
     }
@@ -204,7 +305,7 @@ public class GridManager : MonoBehaviour
 
 
 
-    #region Grid Setup functions
+    #region Grid Setup
     [ContextMenu("Initialize Grid")]
     public void SetupGrid()
     {
@@ -257,6 +358,7 @@ public class GridManager : MonoBehaviour
                     }
                 }
             }
+            
             // finally we loop back as long as the above nested for loop has found at least one match
         } while (allMatches.Count != 0);
 
@@ -411,6 +513,11 @@ public class GridManager : MonoBehaviour
         /// Call this when this cell's content is being swapped with another.
         /// </summary>
         public SwapDelegate Swap;
+
+        /// <summary>
+        /// Call this when the user tries to swap this cell's content with another, but the swap wouldn't result in a match and must be reversed.
+        /// </summary>
+        public SwapDelegate SwapFail;
 
         /// <summary>
         /// Call this when this cell's content are being "popped", eg when a match is made.

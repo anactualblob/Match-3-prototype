@@ -93,6 +93,46 @@ public class GridDisplayer : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// This static function returns a GridElement_Candy to its pool according to its color variable.
+    /// </summary>
+    /// <param name="candy"></param>
+    public static void ReturnCandyToPool(GridElement_Candy candy)
+    {
+        CandyPool pool = null;
+        switch (candy.color)
+        {
+            case GridElement_Candy.CandyColor.red:
+                pool = S.redCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.blue:
+                pool = S.blueCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.green:
+                pool = S.greenCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.yellow:
+                pool = S.yellowCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.orange:
+                pool = S.orangeCandyPool;
+                break;
+            
+            default:
+                Debug.LogError("GridDisplayer.cs : The candy you are trying to return to its pool has an unrecognized color.", candy.gameObject);
+                break;
+        }
+
+        if (pool != null) pool.ReturnToPool(candy.gameObject);
+    }
+
+
+
+    #region Gird Display Initialization & Teardown
     void GridDisplayInit()
     {
         float hCellSize = (gridBackgroundSprite.size.x - (horizontalMargin * 2)) / GridManager.GRID_WIDTH;
@@ -109,7 +149,7 @@ public class GridDisplayer : MonoBehaviour
                 if (GridManager.GRID[i, j].cellContent != GridManager.CellContents.hole)
                 {
                     // instantiate cells and set their sizes
-                    // maybe use a pool for cell backgrounds ?
+                    // maybe use a pool for cell backgrounds ? (no need probably)
                     GameObject cell = Instantiate(gridCellBackgroundPrefab, GridToWorld(i, j), Quaternion.identity, cellContainer);
                     cell.GetComponent<SpriteRenderer>().size = new Vector2(cellSize, cellSize);
                 }
@@ -150,8 +190,10 @@ public class GridDisplayer : MonoBehaviour
                     current.transform.rotation = Quaternion.identity;
 
                     GridElement gridElementComponent = current.GetComponent<GridElement>();
+
                     GridManager.GRID[i, j].Swap += gridElementComponent.OnSwap;
                     GridManager.GRID[i, j].Pop += gridElementComponent.OnPop;
+                    GridManager.GRID[i, j].SwapFail += gridElementComponent.OnSwapFail; 
 
                     gridElementComponent.x = i;
                     gridElementComponent.y = j;
@@ -176,10 +218,10 @@ public class GridDisplayer : MonoBehaviour
     {
         S.GridDisplayTeardown();
     }
+    #endregion
 
 
-
-    # region Grid helper functions
+    #region Grid helper functions
     public static Vector2 GridToWorld(Vector2Int gridPos)
     {
         float x = S.offsetFromCenter.x + (S.cellSize * gridPos.x) - (S.cellSize * (GridManager.GRID_WIDTH - 1)) / 2;

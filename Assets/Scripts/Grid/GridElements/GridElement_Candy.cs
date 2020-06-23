@@ -38,14 +38,25 @@ public class GridElement_Candy : GridElement
     }
 
 
+    public override void OnSwapFail(Vector2Int newCellPos)
+    {
+        // tween to new position then back to original position.
+        // no state change.
+        Debug.Log("swap failed");
+    }
+
+
 
     public override void OnPop()
     {
-        // disappear
         // spawn aprticles ?
         // sound effects ?
         // etc.
+
+        // disappear
+        GridDisplayer.ReturnCandyToPool(this);
     }
+
 
 
 
@@ -62,6 +73,7 @@ public class GridElement_Candy : GridElement
         {
             GridManager.GRID[x, y].Pop -= this.OnPop;
             GridManager.GRID[x, y].Swap -= this.OnSwap;
+            GridManager.GRID[x, y].SwapFail -= this.OnSwapFail;
         }
         
     }
