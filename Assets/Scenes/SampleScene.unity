@@ -922,4 +922,4 @@ MonoBehaviour:
     type: 3}
   candyGreen: {fileID: 975592408743132416, guid: 19269422f43cd6f4d929ccc1b7cf1b51,
     type: 3}
-  totalCellsToPoolCandiesRatio: 0.4
+  totalCellsToPoolCandiesRatio: 0.5

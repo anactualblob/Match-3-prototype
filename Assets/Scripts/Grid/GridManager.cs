@@ -24,11 +24,11 @@ public class GridManager : MonoBehaviour
     }
 
 
+
     [SerializeField] TextAsset levelJSON = null;
 
 
     TouchInfo primaryTouchInfo;
-
     Vector2Int selectedCell;
     bool cellSelected;
     Vector2Int swipedCell;
@@ -40,7 +40,7 @@ public class GridManager : MonoBehaviour
     {
         get { return S.grid; }
     }
-
+    
 
 
     [Header("Grid Settings")]
@@ -66,6 +66,7 @@ public class GridManager : MonoBehaviour
         S = this;
     }
 
+
     private void Start()
     {
         // grid initialization
@@ -89,7 +90,7 @@ public class GridManager : MonoBehaviour
             if (primaryTouchInfo.startGridPosition != new Vector2Int(int.MinValue, int.MinValue)) // grid position is (minvalue, minvalue) when outside the grid
             {
                 selectedCell = primaryTouchInfo.startGridPosition;
-                Debug.Log(grid[selectedCell.x, selectedCell.y].cellContent);
+                //Debug.Log(grid[selectedCell.x, selectedCell.y].cellContent);
             }
 
             cellSelected = true;
@@ -118,23 +119,35 @@ public class GridManager : MonoBehaviour
                     grid[selectedCell.x, selectedCell.y].cellContent = temp;
 
 
-                    // this is kind of a hack :
-                    // Basically, when a GridElement swaps, it deregisters its swap method from its 
-                    //    current cell and registers it on the new cell. however, since the new 
-                    //    cell's swap method gets called right after, the first GridElement's swap 
-                    //    method was being called twice. 
-                    //    We "solve" this by taking a "snapshot" of the swiped gridcell before the 
-                    //    first GridElement registers its swap method on it, and calling the swap
-                    //    method of this "snapshot". The first GridElement's swap method is only 
-                    //    called once and still registers itself on the right cell.
-                    GridCell swipedCellCopy = grid[swipedCell.x, swipedCell.y];
+                    if (GetMatchesAtCell(swipedCell).Count != 0 || GetMatchesAtCell(selectedCell).Count != 0)
+                    {
 
-                    if (grid[selectedCell.x, selectedCell.y].Swap != null)
-                        grid[selectedCell.x, selectedCell.y].Swap(new Vector2Int(swipedCell.x, swipedCell.y));
+                        // this is kind of a hack :
+                        // Basically, when a GridElement swaps, it deregisters its swap method from its 
+                        //    current cell and registers it on the new cell. however, since the new 
+                        //    cell's swap method gets called right after, the first GridElement's swap 
+                        //    method was being called twice. 
+                        //    We "solve" this by taking a "snapshot" of the swiped gridcell before the 
+                        //    first GridElement registers its swap method on it, and calling the swap
+                        //    method of this "snapshot". The first GridElement's swap method is only 
+                        //    called once and still registers itself on the right cell.
+                        GridCell swipedCellCopy = grid[swipedCell.x, swipedCell.y];
 
-                    if (swipedCellCopy.Swap != null)
-                        swipedCellCopy.Swap(new Vector2Int(selectedCell.x, selectedCell.y));
+                        if (grid[selectedCell.x, selectedCell.y].Swap != null)
+                            grid[selectedCell.x, selectedCell.y].Swap(new Vector2Int(swipedCell.x, swipedCell.y));
 
+                        if (swipedCellCopy.Swap != null)
+                            swipedCellCopy.Swap(new Vector2Int(selectedCell.x, selectedCell.y));
+                    }
+                    else
+                    {
+                        // call swap fail event (also create a swap fail event)
+
+                        // swap cell contents back
+                        CellContents temp2 = grid[swipedCell.x, swipedCell.y].cellContent;
+                        grid[swipedCell.x, swipedCell.y].cellContent = grid[selectedCell.x, selectedCell.y].cellContent;
+                        grid[selectedCell.x, selectedCell.y].cellContent = temp2;
+                    }
 
                 }
             }
@@ -142,11 +155,59 @@ public class GridManager : MonoBehaviour
     }
 
 
+    
+    public List<Vector2Int> GetMatchesAtCell(GridCell cell)
+    {
+        Vector2Int[] directions =
+        {
+            Vector2Int.up,
+            Vector2Int.right,
+            Vector2Int.down,
+            Vector2Int.left
+        };
+
+        List<Vector2Int> matches = new List<Vector2Int>();
+
+        for (int i = 0; i<directions.Length; ++i)
+        {
+            if (cell.x + directions[i].x >= GRID_WIDTH || cell.x + directions[i].x < 0 || cell.y + directions[i].y >= GRID_HEIGHT || cell.y + directions[i].y < 0)
+            {
+                continue;
+            }
+            GridCell checkedCell = grid[cell.x + directions[i].x, cell.y + directions[i].y];
+
+            if (cell.cellContent == checkedCell.cellContent)
+            {
+                if (checkedCell.x + directions[i].x >= GRID_WIDTH || checkedCell.x + directions[i].x < 0 || checkedCell.y + directions[i].y >= GRID_HEIGHT || checkedCell.y + directions[i].y < 0)
+                {
+                    continue;
+                }
+
+                GridCell thirdCell = grid[checkedCell.x + directions[i].x, checkedCell.y + directions[i].y];
+                if (checkedCell.cellContent == thirdCell.cellContent)
+                {
+                    matches.Add(new Vector2Int(cell.x, cell.y));
+                    matches.Add(new Vector2Int(checkedCell.x, checkedCell.y));
+                    matches.Add(new Vector2Int(thirdCell.x, thirdCell.y));
+                }
+            }
+        }
+
+        return matches;
+    }
+
+    public List<Vector2Int> GetMatchesAtCell(Vector2Int cellPos)
+    {
+        return GetMatchesAtCell(grid[cellPos.x, cellPos.y]);
+    }
+
+
+
+
     #region Grid Setup functions
     [ContextMenu("Initialize Grid")]
     public void SetupGrid()
     {
-        EmptyCellContents();
 
         grid = new GridCell[GRID_WIDTH, GRID_HEIGHT];
 
@@ -165,32 +226,44 @@ public class GridManager : MonoBehaviour
                     // FIND A BETTER WAY TO DO THIS
                     cellContent = (CellContents)Random.Range(1, 6)
                 };
-
-                //// set grid cell values
-                //grid[i, j].visible = true;
-                //grid[i, j].empty = false;
-                //grid[i, j].x = i;
-                //grid[i, j].y = j;
-                //
-                //// FIND A BETTER WAY TO DO THIS
-                //grid[i, j].cellContent = (CellContents)Random.Range(1, 6); 
             }
         }
 
+
+        // INITIAL MATCH DETECTION FOR CLEAN GRID
+        List<Vector2Int> allMatches = new List<Vector2Int>();
+        do
+        {
+            // we first remove the matches if there are any.
+            for (int i = 0; i < allMatches.Count; i++)
+            {
+                Vector2Int cell = allMatches[i];
+                grid[cell.x, cell.y].cellContent = (CellContents)Random.Range(1, 6);
+                allMatches.Remove(cell);
+            }
+
+            // then we check the grid for matches. The above operation might have created new matches.
+            for (int i = 0; i < GRID_WIDTH; ++i)
+            {
+                for (int j = 0; j < GRID_HEIGHT; ++j)
+                {
+                    foreach (Vector2Int cellPos in GetMatchesAtCell(new Vector2Int(i, j)))
+                    {
+                        if (!allMatches.Contains(cellPos))
+                        {
+                            allMatches.Add(cellPos);
+                        }
+                    }
+                }
+            }
+            // finally we loop back as long as the above nested for loop has found at least one match
+        } while (allMatches.Count != 0);
+
+
         GridDisplayer.InitializeGridDisplay();
-
     }
 
-
-    public void EmptyCellContents()
-    {
-        // delete all cell contents
-    }
     #endregion
-
-
-
-    
 
 
 
@@ -329,6 +402,7 @@ public class GridManager : MonoBehaviour
 
         public CellContents cellContent;
 
+
         public delegate void SwapDelegate(Vector2Int newCellPos);
         public delegate void PopDelegate();
 
@@ -341,6 +415,12 @@ public class GridManager : MonoBehaviour
         /// Call this when this cell's content are being "popped", eg when a match is made.
         /// </summary>
         public PopDelegate Pop;
+
+
+        public static CellContents GetRandomCellContent()
+        {
+            return 0;
+        }
     }
 
     public enum CellContents
@@ -381,5 +461,8 @@ public class GridManager : MonoBehaviour
 
     }
 
+
+    
     #endregion
 }
+
