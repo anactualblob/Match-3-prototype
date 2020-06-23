@@ -208,6 +208,7 @@ public class GridManager : MonoBehaviour
     [ContextMenu("Initialize Grid")]
     public void SetupGrid()
     {
+        GridDisplayer.TeardownGridDisplay();
 
         grid = new GridCell[GRID_WIDTH, GRID_HEIGHT];
 

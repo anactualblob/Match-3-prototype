@@ -42,7 +42,7 @@ public class GridDisplayer : MonoBehaviour
     [SerializeField] GameObject candyGreen;
 
     [Header("Candy Pool Parameters")]
-    [Tooltip("What proportion of the total cell count should serve as the number of pooled objects? 1 = pools have as many objects as there are cells in the grid, 0.5 = half as much, etc.")]
+    [Tooltip("What proportion of the total cell count should serve as the number of pooled objects? 1 = each pool has as many objects as there are cells in the grid, 0.5 = half as much, etc.")]
     [SerializeField] float totalCellsToPoolCandiesRatio;
     int numberOfPooledCandies;
     CandyPool redCandyPool,
@@ -93,7 +93,7 @@ public class GridDisplayer : MonoBehaviour
         
     }
 
-    public void GridDisplayInit()
+    void GridDisplayInit()
     {
         float hCellSize = (gridBackgroundSprite.size.x - (horizontalMargin * 2)) / GridManager.GRID_WIDTH;
         float vCellSize = (gridBackgroundSprite.size.y - (verticalMargin * 2)) / GridManager.GRID_HEIGHT;
@@ -109,6 +109,7 @@ public class GridDisplayer : MonoBehaviour
                 if (GridManager.GRID[i, j].cellContent != GridManager.CellContents.hole)
                 {
                     // instantiate cells and set their sizes
+                    // maybe use a pool for cell backgrounds ?
                     GameObject cell = Instantiate(gridCellBackgroundPrefab, GridToWorld(i, j), Quaternion.identity, cellContainer);
                     cell.GetComponent<SpriteRenderer>().size = new Vector2(cellSize, cellSize);
                 }
@@ -159,10 +160,21 @@ public class GridDisplayer : MonoBehaviour
         }
     }
 
+    void GridDisplayTeardown()
+    {
+        // return all grid gameobjects to their pools, and destroy cell backgrounds.
+    }
+
     // static wrapper for calling GridDisplayInit from external scripts
     public static void InitializeGridDisplay()
     {
         S.GridDisplayInit();
+    }
+
+    // static wrapper for calling GridDisplayTeardown from external scripts
+    public static void TeardownGridDisplay()
+    {
+        S.GridDisplayTeardown();
     }
 
 
