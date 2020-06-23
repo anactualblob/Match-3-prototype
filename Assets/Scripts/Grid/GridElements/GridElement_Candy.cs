@@ -42,7 +42,8 @@ public class GridElement_Candy : GridElement
     {
         // tween to new position then back to original position.
         // no state change.
-        Debug.Log("swap failed");
+
+        //Debug.Log("swap failed");
     }
 
 

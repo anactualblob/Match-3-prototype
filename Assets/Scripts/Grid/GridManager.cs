@@ -142,6 +142,8 @@ public class GridManager : MonoBehaviour
                         {
                             if (grid[cell.x, cell.y].Pop != null)
                                 grid[cell.x, cell.y].Pop();
+
+                            grid[cell.x, cell.y].cellContent = CellContents.empty;
                         }
 
                     }
