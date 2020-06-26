@@ -41,6 +41,7 @@ public class GridDisplayer : MonoBehaviour
     [SerializeField] GameObject candyYellow;
     [SerializeField] GameObject candyGreen;
 
+
     [Header("Candy Pool Parameters")]
     [Tooltip("What proportion of the total cell count should serve as the number of pooled objects? 1 = each pool has as many objects as there are cells in the grid, 0.5 = half as much, etc.")]
     [SerializeField] float totalCellsToPoolCandiesRatio;
@@ -56,6 +57,10 @@ public class GridDisplayer : MonoBehaviour
     Transform cellContainer;
     Transform gridElementContainer;
     Transform poolContainer;
+
+
+    List<GridElement_Candy> tweeningCandies = new List<GridElement_Candy>();
+    
 
     private void Awake()
     {
@@ -90,46 +95,26 @@ public class GridDisplayer : MonoBehaviour
 
     private void Start()
     {
-        
+
     }
 
-    /// <summary>
-    /// This static function returns a GridElement_Candy to its pool according to its color variable.
-    /// </summary>
-    /// <param name="candy"></param>
-    public static void ReturnCandyToPool(GridElement_Candy candy)
+
+    #region Candy Tween Tracking
+    public static void NotifyTweenStart(GridElement_Candy candy)
     {
-        CandyPool pool = null;
-        switch (candy.color)
-        {
-            case GridElement_Candy.CandyColor.red:
-                pool = S.redCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.blue:
-                pool = S.blueCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.green:
-                pool = S.greenCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.yellow:
-                pool = S.yellowCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.orange:
-                pool = S.orangeCandyPool;
-                break;
-            
-            default:
-                Debug.LogError("GridDisplayer.cs : The candy you are trying to return to its pool has an unrecognized color.", candy.gameObject);
-                break;
-        }
-
-        if (pool != null) pool.ReturnToPool(candy.gameObject);
+        S.tweeningCandies.Add(candy);
     }
 
+    public static void NotifyTweenEnd(GridElement_Candy candy)
+    {
+        S.tweeningCandies.Remove(candy);
+    }
+
+    public static bool TweenInProgress()
+    {
+        return (S.tweeningCandies.Count > 0);
+    }
+    #endregion
 
 
     #region Gird Display Initialization & Teardown
@@ -329,5 +314,44 @@ public class GridDisplayer : MonoBehaviour
 
     }
 
+
+    /// <summary>
+    /// This static function returns a GridElement_Candy to its pool according to its color variable.
+    /// </summary>
+    /// <param name="candy"></param>
+    public static void ReturnCandyToPool(GridElement_Candy candy)
+    {
+        CandyPool pool = null;
+        switch (candy.color)
+        {
+            case GridElement_Candy.CandyColor.red:
+                pool = S.redCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.blue:
+                pool = S.blueCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.green:
+                pool = S.greenCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.yellow:
+                pool = S.yellowCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.orange:
+                pool = S.orangeCandyPool;
+                break;
+
+            default:
+                Debug.LogError("GridDisplayer.cs : The candy you are trying to return to its pool has an unrecognized color.", candy.gameObject);
+                break;
+        }
+
+        if (pool != null) pool.ReturnToPool(candy.gameObject);
+    }
+
     #endregion
+
 }

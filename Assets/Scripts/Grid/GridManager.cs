@@ -79,6 +79,13 @@ public class GridManager : MonoBehaviour
 
     private void Update()
     {
+        // if we're currently animating, don't update grid state until the display of the grid is caught up ith the current grid state.
+        if (GridDisplayer.TweenInProgress())
+        {
+            return;
+        }
+
+        
         if (primaryTouchInfo.touching && !cellSelected)
         {
             // user is touching inside the grid
@@ -137,6 +144,7 @@ public class GridManager : MonoBehaviour
 
                         if (swipedCellCopy.Swap != null)
                             swipedCellCopy.Swap(selectedCell);
+
 
                         foreach (Vector2Int cell in matches)
                         {
@@ -236,6 +244,7 @@ public class GridManager : MonoBehaviour
 
 
         // Find matches of type OXO
+
         // The way this works is that we've populated a directionnalMatches array of 4 rows & 2 columns in the code above. 
         // Each row corresponds to a direction, in the order Up Right Down Left. We check if we stored a match by comparing
         //    an item of the array to a (-1,-1) vector, which we filled the array with after having created it. If it's not
