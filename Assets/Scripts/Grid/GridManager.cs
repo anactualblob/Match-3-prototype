@@ -113,6 +113,8 @@ public class GridManager : MonoBehaviour
                 // user is swiping inside the grid
                 if (x < GRID_WIDTH && y < GRID_HEIGHT && x >= 0 && y >= 0)
                 {
+                    Debug.Log("attemtping swipe");
+
                     // the cell the player is swiping
                     swipedCell = new Vector2Int(x,y);
 
@@ -257,50 +259,76 @@ public class GridManager : MonoBehaviour
         // This makes it so that we can detect both OXO matches, and matches of more than 3. I could maybe have optimized it
         //    or wrapped it in a loop or have thought up a better algorithm, but this works so eh ¯\_(ツ)_/¯
         // Also we do the same again further below but for rows 1 and 3, directions right and left.
+        // i've commented out the non loop version and pu in a loop version. it's maybe less readable but also less error prone.
+        // if it somehow doesn't work (it seems fine to me), i'll put the non-looping version back in.
         Vector2Int noMatch = new Vector2Int(-1, -1);
-
-        if (directionalMatches[0,0] != noMatch && directionalMatches[2,0] != noMatch)
+        for (int i = 0; i<2; ++i)
         {
-            if (!matches.Contains(directionalMatches[0, 0])) matches.Add(directionalMatches[0, 0]);
-            if (!matches.Contains(directionalMatches[2, 0])) matches.Add(directionalMatches[2, 0]);
-            if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
-
-            if (directionalMatches[0,1] != noMatch)
+            if (directionalMatches[i, 0] != noMatch && directionalMatches[i+2, 0] != noMatch)
             {
-                //match4 = true;
-                if (!matches.Contains(directionalMatches[0, 1])) matches.Add(directionalMatches[0, 1]);
-            }
+                if (!matches.Contains(directionalMatches[i, 0])) matches.Add(directionalMatches[i, 0]);
+                if (!matches.Contains(directionalMatches[i+2, 0])) matches.Add(directionalMatches[i+2, 0]);
+                if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
 
-            if (directionalMatches[2,1] != noMatch)
-            {
-                //if (match4) match5 = true;
-                //else match4 = true;
+                if (directionalMatches[i, 1] != noMatch)
+                {
+                    //match4 = true;
+                    if (!matches.Contains(directionalMatches[i, 1])) matches.Add(directionalMatches[i, 1]);
+                }
 
-                if (!matches.Contains(directionalMatches[2, 1])) matches.Add(directionalMatches[2, 1]);
+                if (directionalMatches[i+2, 1] != noMatch)
+                {
+                    //if (match4) match5 = true;
+                    //else match4 = true;
+
+                    if (!matches.Contains(directionalMatches[i+2, 1])) matches.Add(directionalMatches[2, 1]);
+                }
             }
         }
+        
 
-
-        if (directionalMatches[1, 0] != noMatch && directionalMatches[3, 0] != noMatch)
-        {
-            if (!matches.Contains(directionalMatches[1, 0])) matches.Add(directionalMatches[1, 0]);
-            if (!matches.Contains(directionalMatches[3, 0])) matches.Add(directionalMatches[3, 0]);
-            if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
-
-            if (directionalMatches[1, 1] != noMatch)
-            {
-                //match4 = true;
-                if (!matches.Contains(directionalMatches[1, 1])) matches.Add(directionalMatches[1, 1]);
-            }
-
-            if (directionalMatches[2, 1] != noMatch)
-            {
-                //if (match4) match5 = true;
-                //else match4 = true;
-
-                if (!matches.Contains(directionalMatches[3, 1])) matches.Add(directionalMatches[3, 1]);
-            }
-        }
+        //if (directionalMatches[0,0] != noMatch && directionalMatches[2,0] != noMatch)
+        //{
+        //    if (!matches.Contains(directionalMatches[0, 0])) matches.Add(directionalMatches[0, 0]);
+        //    if (!matches.Contains(directionalMatches[2, 0])) matches.Add(directionalMatches[2, 0]);
+        //    if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
+        //
+        //    if (directionalMatches[0,1] != noMatch)
+        //    {
+        //        //match4 = true;
+        //        if (!matches.Contains(directionalMatches[0, 1])) matches.Add(directionalMatches[0, 1]);
+        //    }
+        //
+        //    if (directionalMatches[2,1] != noMatch)
+        //    {
+        //        //if (match4) match5 = true;
+        //        //else match4 = true;
+        //
+        //        if (!matches.Contains(directionalMatches[2, 1])) matches.Add(directionalMatches[2, 1]);
+        //    }
+        //}
+        //
+        //
+        //if (directionalMatches[1, 0] != noMatch && directionalMatches[3, 0] != noMatch)
+        //{
+        //    if (!matches.Contains(directionalMatches[1, 0])) matches.Add(directionalMatches[1, 0]);
+        //    if (!matches.Contains(directionalMatches[3, 0])) matches.Add(directionalMatches[3, 0]);
+        //    if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
+        //
+        //    if (directionalMatches[1, 1] != noMatch)
+        //    {
+        //        //match4 = true;
+        //        if (!matches.Contains(directionalMatches[1, 1])) matches.Add(directionalMatches[1, 1]);
+        //    }
+        //
+        //    if (directionalMatches[3, 1] != noMatch)
+        //    {
+        //        //if (match4) match5 = true;
+        //        //else match4 = true;
+        //
+        //        if (!matches.Contains(directionalMatches[3, 1])) matches.Add(directionalMatches[3, 1]);
+        //    }
+        //}
 
         // i know the code above is terrible it works don't @ me 
         // also TODO find a way to use match4 and match5 ?
