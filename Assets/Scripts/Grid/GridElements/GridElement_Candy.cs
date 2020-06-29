@@ -7,8 +7,42 @@ public class GridElement_Candy : GridElement
 {
     float swapTweenDuration = 0.2f;
     float popTweenDuration = 0.2f;
+    float fallTweenDuration = 0.2f;
 
-    Sequence masterSequence = null;
+    Sequence _masterSequence = null;
+
+    /// <summary>
+    /// Property that wraps _masterSequence, setting it to a new sequence if it is null or marked as dirty.
+    /// <para>
+    /// Also passes anonymous functions to the sequence's OnStart and OnComplete callbacks.
+    /// </para>
+    /// </summary>
+    Sequence MasterSequence
+    {
+        get
+        {
+            if (sequenceDirty || _masterSequence == null)
+            {
+                _masterSequence = DOTween.Sequence();
+                sequenceDirty = false;
+
+                _masterSequence.OnStart(() =>
+                {
+                    GridDisplayer.NotifyTweenStart(this);
+                });
+
+                _masterSequence.OnComplete(() =>
+                {
+                    GridDisplayer.NotifyTweenEnd(this);
+                    wasSwapped = false;
+                    sequenceDirty = true;
+                });
+            }
+
+            return _masterSequence;
+        }
+    }
+
 
     bool sequenceDirty = false;
     bool wasSwapped = false;
@@ -24,6 +58,9 @@ public class GridElement_Candy : GridElement
     }
     public CandyColor color;
 
+
+
+
     private void Start()
     {
         DOTween.Init();
@@ -31,26 +68,21 @@ public class GridElement_Candy : GridElement
 
 
 
+
     public override void OnSwap(Vector2Int newCellPos)
     {
+        // deregister methods from the original cell
+        DeRegisterMethodsFromCell(x, y);
 
-        // deregister onSwap & OnPop from the original cell
-        GridManager.GRID[x, y].Pop -= this.OnPop;
-        GridManager.GRID[x, y].Swap -= this.OnSwap;
-
-
-        // register onSwap and OnPop on the new cell
-        GridManager.GRID[newCellPos.x, newCellPos.y].Pop += this.OnPop;
-        GridManager.GRID[newCellPos.x, newCellPos.y].Swap += this.OnSwap;
+        // register methods on the new cell
+        RegisterMethodsOnCell(newCellPos);
 
         // set x and y to new cell
         x = newCellPos.x;
         y = newCellPos.y;
 
         // tween position
-        DOTweenMasterSequenceInit();
-
-        masterSequence.Append(transform.DOMove(GridDisplayer.GridToWorld(x, y), swapTweenDuration));
+        MasterSequence.Append(transform.DOMove(GridDisplayer.GridToWorld(x, y), swapTweenDuration));
 
         wasSwapped = true;
     }
@@ -59,14 +91,9 @@ public class GridElement_Candy : GridElement
 
     public override void OnSwapFail(Vector2Int newCellPos)
     {
-        //notify the GridDisplayer that we're starting to tween
-        //GridDisplayer.NotifyTweenStart(this);
-
-        //craft the tween sequence
-        DOTweenMasterSequenceInit();
-
-        masterSequence.Append(transform.DOMove(GridDisplayer.GridToWorld(newCellPos), swapTweenDuration))
-            .Append(transform.DOMove(GridDisplayer.GridToWorld(x, y), swapTweenDuration));
+        // move to the new position then back to the old one
+        MasterSequence.Append(transform.DOMove(GridDisplayer.GridToWorld(newCellPos), swapTweenDuration));
+        MasterSequence.Append(transform.DOMove(GridDisplayer.GridToWorld(x, y), swapTweenDuration));
     }
 
 
@@ -78,42 +105,64 @@ public class GridElement_Candy : GridElement
         // etc.
 
 
-        DOTweenMasterSequenceInit();
-
         // if this cell is part of a match but isn't the one that was swapped this frame, it 
         //    needs to wait for the swap tween to end before disappearing
         if (!wasSwapped)
-            masterSequence.AppendInterval(swapTweenDuration);
+            MasterSequence.AppendInterval(swapTweenDuration);
 
-        masterSequence.Append(transform.DOScale(0, popTweenDuration));
-        masterSequence.AppendCallback(() => GridDisplayer.ReturnCandyToPool(this));
+        MasterSequence.Append( transform.DOScale(0, popTweenDuration).SetEase(Ease.InBack) );
+        MasterSequence.AppendCallback(() => GridDisplayer.ReturnCandyToPool(this)) ;
+
+        // scale the game object back to 1 after returning it so that it's scaled properly when we get it back from the pool again
+        MasterSequence.AppendCallback( () => transform.localScale = new Vector3(1, 1, 1));
     }
 
 
-    /// <summary>
-    /// This function  must be called before attemtping to append tweens to the masterSequence. It initiates the masterSequence if it's null or if it is marked as dirty.
-    /// <para>It also registers GridDisplayer NotifyTweenStart/End on the masterSequence's OnStart and OnComplete, respectively.</para>
-    /// </summary>
-    void DOTweenMasterSequenceInit()
+
+    public override void OnFall(int fallHeight)
     {
-        if (sequenceDirty || masterSequence == null)
-        {
-            masterSequence = DOTween.Sequence();
-            sequenceDirty = false;
+        DeRegisterMethodsFromCell(x, y);
+        RegisterMethodsOnCell(x, y+fallHeight);
+        
+        y += fallHeight;
 
-            masterSequence.OnStart(() =>
-            {
-                GridDisplayer.NotifyTweenStart(this);
-            });
-
-            masterSequence.OnComplete(() =>
-            {
-                GridDisplayer.NotifyTweenEnd(this);
-                wasSwapped = false;
-                sequenceDirty = true;
-            });
-        }
+        MasterSequence.Append( transform.DOMove( GridDisplayer.GridToWorld(x, y), fallTweenDuration).SetEase(Ease.OutBounce) );
+        //Debug.Log("fall", this);
     }
+
+
+
+
+
+
+    public void RegisterMethodsOnCell(int x, int y)
+    {
+        GridManager.GRID[x, y].Pop += this.OnPop;
+        GridManager.GRID[x, y].Swap += this.OnSwap;
+        GridManager.GRID[x, y].SwapFail += this.OnSwapFail;
+        GridManager.GRID[x, y].Fall += this.OnFall;
+    }
+
+    public void RegisterMethodsOnCell(Vector2Int cellPos)
+    {
+        RegisterMethodsOnCell(cellPos.x, cellPos.y);
+    }
+
+    public void DeRegisterMethodsFromCell(int x, int y)
+    {
+        GridManager.GRID[x, y].Pop -= this.OnPop;
+        GridManager.GRID[x, y].Swap -= this.OnSwap;
+        GridManager.GRID[x, y].SwapFail -= this.OnSwapFail;
+        GridManager.GRID[x, y].Fall -= this.OnFall;
+    }
+
+    public void DeRegisterMethodsFromCell(Vector2Int cellPos)
+    {
+        DeRegisterMethodsFromCell(cellPos.x, cellPos.y);
+    }
+
+
+
 
 
 
@@ -128,9 +177,7 @@ public class GridElement_Candy : GridElement
         //   is created, since object pools are created in awake and the grid is setup in start
         if (GridManager.GRID != null)
         {
-            GridManager.GRID[x, y].Pop -= this.OnPop;
-            GridManager.GRID[x, y].Swap -= this.OnSwap;
-            GridManager.GRID[x, y].SwapFail -= this.OnSwapFail;
+            DeRegisterMethodsFromCell(x, y);
         }
         
     }

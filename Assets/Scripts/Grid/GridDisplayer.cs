@@ -174,11 +174,10 @@ public class GridDisplayer : MonoBehaviour
                     current.transform.position = GridToWorld(i, j);
                     current.transform.rotation = Quaternion.identity;
 
-                    GridElement gridElementComponent = current.GetComponent<GridElement>();
+                    GridElement_Candy gridElementComponent = current.GetComponent<GridElement_Candy>();
 
-                    GridManager.GRID[i, j].Swap += gridElementComponent.OnSwap;
-                    GridManager.GRID[i, j].Pop += gridElementComponent.OnPop;
-                    GridManager.GRID[i, j].SwapFail += gridElementComponent.OnSwapFail; 
+                    // wire the GridElement methods to the GridCell delegates
+                    gridElementComponent.RegisterMethodsOnCell(i, j);
 
                     gridElementComponent.x = i;
                     gridElementComponent.y = j;

@@ -33,6 +33,7 @@ public abstract class GridElement : MonoBehaviour
     public abstract void OnSwapFail(Vector2Int newCellPos);
 
 
+    public abstract void OnFall(int fallHeight);
 
     
 }

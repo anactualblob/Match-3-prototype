@@ -93,7 +93,7 @@ public class GridManager : MonoBehaviour
             {
                 selectedCell = primaryTouchInfo.startGridPosition;
                 cellSelected = true;
-                //Debug.Log(grid[selectedCell.x, selectedCell.y].cellContent);
+                Debug.Log(grid[selectedCell.x, selectedCell.y].cellContent);
             }
         }
 
@@ -102,7 +102,8 @@ public class GridManager : MonoBehaviour
             cellSelected = false;
         }
 
-        if(shouldGetSwipedCell)
+        #region Candy Swapping
+        if (shouldGetSwipedCell)
         {
             // user has touched inside the grid
             if (primaryTouchInfo.startGridPosition != new Vector2Int(int.MinValue, int.MinValue))
@@ -113,7 +114,6 @@ public class GridManager : MonoBehaviour
                 // user is swiping inside the grid
                 if (x < GRID_WIDTH && y < GRID_HEIGHT && x >= 0 && y >= 0)
                 {
-                    Debug.Log("attemtping swipe");
 
                     // the cell the player is swiping
                     swipedCell = new Vector2Int(x,y);
@@ -155,7 +155,7 @@ public class GridManager : MonoBehaviour
 
                             grid[cell.x, cell.y].cellContent = CellContents.empty;
                         }
-
+                        return;
                     }
                     else
                     {
@@ -173,18 +173,75 @@ public class GridManager : MonoBehaviour
                         grid[swipedCell.x, swipedCell.y].cellContent = grid[selectedCell.x, selectedCell.y].cellContent;
                         grid[selectedCell.x, selectedCell.y].cellContent = temp2;
                     }
+                }
+            }
+
+        }
+        #endregion
+
+        #region Candy Falling
+        if ( GridHasEmptyCells() )
+        {
+            bool candiesFellThisFrame = false;
+
+            for (int j = GRID_HEIGHT - 2; j >= 0; --j)
+            {
+                for (int i = GRID_WIDTH - 1; i >= 0; --i)
+                {
+                    // if we find a non empty cell above an empty cell
+                    if (grid[i, j+1].cellContent == CellContents.empty && grid[i, j].cellContent != CellContents.empty)
+                    {
+                        // the candy will always fall at least one cell
+                        int dist = 0;
+
+                        // go down until we find a cell that's above a non empty cell or at the bottom of the grid
+                        for (int y = j+1; y < GRID_HEIGHT; ++y)
+                        {
+                            dist++;
+                            if (y<GRID_HEIGHT-1)
+                            {
+                                if (grid[i, y + 1].cellContent != CellContents.empty) break; 
+                            }
+                        }
+
+                        // dist is now the number of empty cells between the cell we're at and the next non-empty cell under it
+                        // we call Fall on grid[i,j] and pass it dist
+                        if (grid[i, j].Fall != null) grid[i, j].Fall(dist);
+
+                        grid[i, j + dist].cellContent = grid[i, j].cellContent;
+                        grid[i, j].cellContent = CellContents.empty;
+
+                        candiesFellThisFrame = true;
+                    }
+                }
+            }
+
+            if (candiesFellThisFrame) return;
+
+        }
+        #endregion
 
 
 
-                    
-
+        for (int i = 0; i < GRID_WIDTH; ++i)
+        {
+            for (int j = 0; j < GRID_HEIGHT; ++j)
+            {
+                foreach (Vector2Int cellPos in GetMatchesAtCell(new Vector2Int(i, j)))
+                {
+                    if (grid[cellPos.x, cellPos.y].Pop != null)
+                    {
+                        grid[cellPos.x, cellPos.y].Pop();
+                    }
+                    grid[cellPos.x, cellPos.y].cellContent = CellContents.empty;
                 }
             }
         }
+
     }
 
 
-    
+
     public List<Vector2Int> GetMatchesAtCell(GridCell cell)
     {
         Vector2Int[] directions =
@@ -206,6 +263,9 @@ public class GridManager : MonoBehaviour
 
 
         List<Vector2Int> matches = new List<Vector2Int>();
+
+        if (cell.cellContent == CellContents.empty) return matches;
+
 
         // find matches of type XOO
         for (int i = 0; i<directions.Length; ++i)
@@ -286,50 +346,6 @@ public class GridManager : MonoBehaviour
             }
         }
         
-
-        //if (directionalMatches[0,0] != noMatch && directionalMatches[2,0] != noMatch)
-        //{
-        //    if (!matches.Contains(directionalMatches[0, 0])) matches.Add(directionalMatches[0, 0]);
-        //    if (!matches.Contains(directionalMatches[2, 0])) matches.Add(directionalMatches[2, 0]);
-        //    if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
-        //
-        //    if (directionalMatches[0,1] != noMatch)
-        //    {
-        //        //match4 = true;
-        //        if (!matches.Contains(directionalMatches[0, 1])) matches.Add(directionalMatches[0, 1]);
-        //    }
-        //
-        //    if (directionalMatches[2,1] != noMatch)
-        //    {
-        //        //if (match4) match5 = true;
-        //        //else match4 = true;
-        //
-        //        if (!matches.Contains(directionalMatches[2, 1])) matches.Add(directionalMatches[2, 1]);
-        //    }
-        //}
-        //
-        //
-        //if (directionalMatches[1, 0] != noMatch && directionalMatches[3, 0] != noMatch)
-        //{
-        //    if (!matches.Contains(directionalMatches[1, 0])) matches.Add(directionalMatches[1, 0]);
-        //    if (!matches.Contains(directionalMatches[3, 0])) matches.Add(directionalMatches[3, 0]);
-        //    if (!matches.Contains(new Vector2Int(cell.x, cell.y))) matches.Add(new Vector2Int(cell.x, cell.y));
-        //
-        //    if (directionalMatches[1, 1] != noMatch)
-        //    {
-        //        //match4 = true;
-        //        if (!matches.Contains(directionalMatches[1, 1])) matches.Add(directionalMatches[1, 1]);
-        //    }
-        //
-        //    if (directionalMatches[3, 1] != noMatch)
-        //    {
-        //        //if (match4) match5 = true;
-        //        //else match4 = true;
-        //
-        //        if (!matches.Contains(directionalMatches[3, 1])) matches.Add(directionalMatches[3, 1]);
-        //    }
-        //}
-
         // i know the code above is terrible it works don't @ me 
         // also TODO find a way to use match4 and match5 ?
 
@@ -341,6 +357,18 @@ public class GridManager : MonoBehaviour
         return GetMatchesAtCell(grid[cellPos.x, cellPos.y]);
     }
 
+    public bool GridHasEmptyCells()
+    {
+        foreach (GridCell cell in GRID)
+        {
+            if (cell.cellContent == CellContents.empty)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
 
@@ -406,7 +434,6 @@ public class GridManager : MonoBehaviour
     }
 
     #endregion
-
 
 
     #region Input receiving
@@ -522,7 +549,6 @@ public class GridManager : MonoBehaviour
     #endregion
 
 
-
     #region Structs and Classes
     [System.Serializable]
     public struct GridCell
@@ -546,6 +572,7 @@ public class GridManager : MonoBehaviour
 
 
         public delegate void SwapDelegate(Vector2Int newCellPos);
+        public delegate void FallDelegate(int height);
         public delegate void PopDelegate();
 
         /// <summary>
@@ -557,6 +584,8 @@ public class GridManager : MonoBehaviour
         /// Call this when the user tries to swap this cell's content with another, but the swap wouldn't result in a match and must be reversed.
         /// </summary>
         public SwapDelegate SwapFail;
+
+        public FallDelegate Fall;
 
         /// <summary>
         /// Call this when this cell's content are being "popped", eg when a match is made.
