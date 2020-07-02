@@ -92,29 +92,100 @@ public class GridDisplayer : MonoBehaviour
 
     }
 
-
     private void Start()
     {
 
     }
 
 
-    #region Candy Tween Tracking
-    public static void NotifyTweenStart(GridElement_Candy candy)
+
+
+    public static void SpawnNewCandy(GridManager.CellContents candyType, Vector2Int gridPosition)
     {
-        S.tweeningCandies.Add(candy);
+        if (candyType == GridManager.CellContents.empty || candyType == GridManager.CellContents.hole)
+        {
+            Debug.LogError("GridDisplayer.cs : Couldn't spawn new candy because given CellContents value is not a candy.");
+            return;
+        }
+
+        GameObject newCandy = null;
+
+        switch (candyType)
+        {
+            case GridManager.CellContents.candy_blue:
+                newCandy = S.blueCandyPool.TakeFromPool(true, S.gridElementContainer);
+                break;
+
+            case GridManager.CellContents.candy_red:
+                newCandy = S.redCandyPool.TakeFromPool(true, S.gridElementContainer);
+                break;
+
+            case GridManager.CellContents.candy_green:
+                newCandy = S.greenCandyPool.TakeFromPool(true, S.gridElementContainer);
+                break;
+
+            case GridManager.CellContents.candy_orange:
+                newCandy = S.orangeCandyPool.TakeFromPool(true, S.gridElementContainer);
+                break;
+
+            case GridManager.CellContents.candy_yellow:
+                newCandy = S.yellowCandyPool.TakeFromPool(true, S.gridElementContainer);
+                break;
+        }
+
+
+        newCandy.transform.position = GridToWorld(gridPosition);
+        newCandy.transform.rotation = Quaternion.identity;
+
+        GridElement_Candy gridElementComponent = newCandy.GetComponent<GridElement_Candy>();
+
+        // wire the GridElement methods to the GridCell delegates
+        gridElementComponent.RegisterMethodsOnCell(gridPosition);
+
+        gridElementComponent.x = gridPosition.x;
+        gridElementComponent.y = gridPosition.y;
     }
 
-    public static void NotifyTweenEnd(GridElement_Candy candy)
+
+    /// <summary>
+    /// This static function returns a GridElement_Candy to its pool according to its color variable.
+    /// </summary>
+    /// <param name="candy"></param>
+    public static void ReturnCandyToPool(GridElement_Candy candy)
     {
-        S.tweeningCandies.Remove(candy);
+        CandyPool pool = null;
+        switch (candy.color)
+        {
+            case GridElement_Candy.CandyColor.red:
+                pool = S.redCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.blue:
+                pool = S.blueCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.green:
+                pool = S.greenCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.yellow:
+                pool = S.yellowCandyPool;
+                break;
+
+            case GridElement_Candy.CandyColor.orange:
+                pool = S.orangeCandyPool;
+                break;
+
+            default:
+                Debug.LogError("GridDisplayer.cs : The candy you are trying to return to its pool has an unrecognized color.", candy.gameObject);
+                break;
+        }
+
+        if (pool != null) pool.ReturnToPool(candy.gameObject);
     }
 
-    public static bool TweenInProgress()
-    {
-        return (S.tweeningCandies.Count > 0);
-    }
-    #endregion
+
+
 
 
     #region Gird Display Initialization & Teardown
@@ -205,6 +276,24 @@ public class GridDisplayer : MonoBehaviour
     #endregion
 
 
+    #region Candy Tween Tracking
+    public static void NotifyTweenStart(GridElement_Candy candy)
+    {
+        S.tweeningCandies.Add(candy);
+    }
+
+    public static void NotifyTweenEnd(GridElement_Candy candy)
+    {
+        S.tweeningCandies.Remove(candy);
+    }
+
+    public static bool TweenInProgress()
+    {
+        return (S.tweeningCandies.Count > 0);
+    }
+    #endregion
+
+
     #region Grid helper functions
     public static Vector2 GridToWorld(Vector2Int gridPos)
     {
@@ -265,8 +354,6 @@ public class GridDisplayer : MonoBehaviour
 
 
             index = 0;
-
-
         }
 
         /// <summary>
@@ -314,43 +401,7 @@ public class GridDisplayer : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// This static function returns a GridElement_Candy to its pool according to its color variable.
-    /// </summary>
-    /// <param name="candy"></param>
-    public static void ReturnCandyToPool(GridElement_Candy candy)
-    {
-        CandyPool pool = null;
-        switch (candy.color)
-        {
-            case GridElement_Candy.CandyColor.red:
-                pool = S.redCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.blue:
-                pool = S.blueCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.green:
-                pool = S.greenCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.yellow:
-                pool = S.yellowCandyPool;
-                break;
-
-            case GridElement_Candy.CandyColor.orange:
-                pool = S.orangeCandyPool;
-                break;
-
-            default:
-                Debug.LogError("GridDisplayer.cs : The candy you are trying to return to its pool has an unrecognized color.", candy.gameObject);
-                break;
-        }
-
-        if (pool != null) pool.ReturnToPool(candy.gameObject);
-    }
+    
 
     #endregion
-
 }

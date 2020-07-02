@@ -33,6 +33,7 @@ public class GridManager : MonoBehaviour
     bool cellSelected;
     Vector2Int swipedCell;
     bool shouldGetSwipedCell = false;
+    //bool swipeHappenedThisTouch = false;
 
     
     GridCell[,] grid;
@@ -85,7 +86,6 @@ public class GridManager : MonoBehaviour
             return;
         }
 
-        
         if (primaryTouchInfo.touching && !cellSelected)
         {
             // user is touching inside the grid
@@ -176,6 +176,7 @@ public class GridManager : MonoBehaviour
                 }
             }
 
+            //shouldGetSwipedCell = false;
         }
         #endregion
 
@@ -184,6 +185,7 @@ public class GridManager : MonoBehaviour
         {
             bool candiesFellThisFrame = false;
 
+            // go backwards throught the grid, starting 1 line above the bottom because we're checking if cells below are emtpy
             for (int j = GRID_HEIGHT - 2; j >= 0; --j)
             {
                 for (int i = GRID_WIDTH - 1; i >= 0; --i)
@@ -216,13 +218,57 @@ public class GridManager : MonoBehaviour
                 }
             }
 
+
+            ////for each grid column i, check if grid[i, 0] is empty. if yes, new candies should be spawned.
+            //for (int i = GRID_WIDTH - 1; i >= 0; --i)
+            //{
+            //    if (grid[i, 0].cellContent == CellContents.empty)
+            //    {
+            //        // "probe" down to see how far down the next non-empty cell is
+            //        // Call a GridDisplayer Function to spawn in a new candy in the top row cell
+            //        // call Fall on this top row cell if the distance to the non-emtpy cell is > 0
+            //        int dist = 0;
+            //
+            //        for (int j = 1; j < GRID_WIDTH; ++j)
+            //        {
+            //            if (grid[i, j].cellContent == CellContents.empty)
+            //            {
+            //                ++dist;
+            //            }
+            //            else
+            //            {
+            //                break;
+            //            }
+            //        }
+            //
+            //        // get a random color for the new candy
+            //        // FIND A BETTER WAY TO DO THIS
+            //        CellContents color = (CellContents)Random.Range(1, 6);
+            //
+            //        GridDisplayer.SpawnNewCandy(color, new Vector2Int(i, 0));
+            //
+            //        if (dist > 0)
+            //        {
+            //            if (grid[i, 0].Fall != null) 
+            //                grid[i, 0].Fall(dist);
+            //
+            //            grid[i, dist].cellContent = color;
+            //        }
+            //        else
+            //        {
+            //            grid[i, 0].cellContent = color;
+            //        }
+            //        
+            //    }
+            //}
+
             if (candiesFellThisFrame) return;
 
         }
         #endregion
 
-
-
+        // check the whole grid for matches and pop them
+        // for some reason this doesn't detect 4+ matches sometimes ?
         for (int i = 0; i < GRID_WIDTH; ++i)
         {
             for (int j = 0; j < GRID_HEIGHT; ++j)
@@ -496,6 +542,12 @@ public class GridManager : MonoBehaviour
 
 
         S.primaryTouchInfo = touchInfo;
+
+        //if ((touchInfo.gridPosition - touchInfo.startGridPosition).magnitude >= 1 && !S.swipeHappenedThisTouch)
+        //{
+        //    S.shouldGetSwipedCell = true;
+        //    S.swipeHappenedThisTouch = true;
+        //}
     }
 
 
@@ -545,6 +597,7 @@ public class GridManager : MonoBehaviour
 
         S.primaryTouchInfo = touchInfo;
         S.shouldGetSwipedCell = false;
+        //S.swipeHappenedThisTouch = false;
     }
     #endregion
 
@@ -625,10 +678,16 @@ public class GridManager : MonoBehaviour
         {
             get 
             {
-                // find better way to get the swipe direction
-                // this is based soleley on angle and it's not ideal
                 Vector2 dir = (worldPosition - startWorldposition).normalized;
-                return new Vector2Int(Mathf.RoundToInt(dir.x), Mathf.RoundToInt(dir.y)) ;
+                Vector2Int intDir = new Vector2Int(Mathf.RoundToInt(dir.x), Mathf.RoundToInt(dir.y));
+
+                // if the vector doesn't have a grater than 1 magnitude (that is if it's not diagonal)
+                if (intDir.magnitude <= 1)
+                {
+                    return intDir;
+                }
+                
+                return Vector2Int.zero;
             }
         }
 

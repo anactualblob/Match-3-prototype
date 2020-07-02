@@ -46,6 +46,7 @@ public class GridElement_Candy : GridElement
 
     bool sequenceDirty = false;
     bool wasSwapped = false;
+    bool registered = false;
 
     // possibly useless now
     public enum CandyColor
@@ -127,7 +128,6 @@ public class GridElement_Candy : GridElement
         y += fallHeight;
 
         MasterSequence.Append( transform.DOMove( GridDisplayer.GridToWorld(x, y), fallTweenDuration).SetEase(Ease.OutBounce) );
-        //Debug.Log("fall", this);
     }
 
 
@@ -137,10 +137,19 @@ public class GridElement_Candy : GridElement
 
     public void RegisterMethodsOnCell(int x, int y)
     {
-        GridManager.GRID[x, y].Pop += this.OnPop;
-        GridManager.GRID[x, y].Swap += this.OnSwap;
-        GridManager.GRID[x, y].SwapFail += this.OnSwapFail;
-        GridManager.GRID[x, y].Fall += this.OnFall;
+        if (!registered)
+        {
+            GridManager.GRID[x, y].Pop += this.OnPop;
+            GridManager.GRID[x, y].Swap += this.OnSwap;
+            GridManager.GRID[x, y].SwapFail += this.OnSwapFail;
+            GridManager.GRID[x, y].Fall += this.OnFall;
+
+            registered = true;
+        }
+        else
+        {
+            Debug.LogError("GridElement_Candy.cs : Couldn't register methods on cell because this candy is already registered on another cell.", this);
+        }
     }
 
     public void RegisterMethodsOnCell(Vector2Int cellPos)
@@ -150,10 +159,19 @@ public class GridElement_Candy : GridElement
 
     public void DeRegisterMethodsFromCell(int x, int y)
     {
-        GridManager.GRID[x, y].Pop -= this.OnPop;
-        GridManager.GRID[x, y].Swap -= this.OnSwap;
-        GridManager.GRID[x, y].SwapFail -= this.OnSwapFail;
-        GridManager.GRID[x, y].Fall -= this.OnFall;
+        if (registered)
+        {
+            GridManager.GRID[x, y].Pop -= this.OnPop;
+            GridManager.GRID[x, y].Swap -= this.OnSwap;
+            GridManager.GRID[x, y].SwapFail -= this.OnSwapFail;
+            GridManager.GRID[x, y].Fall -= this.OnFall;
+
+            registered = false;
+        }
+        else
+        {
+            Debug.LogError("GridElement_Candy.cs : Couldn't deregister methods from cell because this candy is no registered on any cell.", this);
+        }
     }
 
     public void DeRegisterMethodsFromCell(Vector2Int cellPos)
