@@ -1,0 +1,68 @@
+VisualElement {
+}
+
+#header {
+    font-size: 25px;
+    -unity-text-align: middle-left;
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(118, 118, 118, 255);
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.body {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+#grid-container {
+    flex-grow: 0;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#grid-info {
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.grid-info-container {
+    margin-left: 8px;
+    margin-right: 8px;
+    flex-direction: row;
+    font-size: 12px;
+    -unity-text-align: middle-left;
+}
+
+#cells-container {
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    width: 90%;
+    min-width: 250px;
+    min-height: 350px;
+    border-left-color: rgba(115, 115, 115, 255);
+    border-right-color: rgba(115, 115, 115, 255);
+    border-top-color: rgba(115, 115, 115, 255);
+    border-bottom-color: rgba(115, 115, 115, 255);
+    max-height: 600px;
+    max-width: 500px;
+    flex-grow: 0;
+}
+

@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="body" class="body" style="justify-content: flex-start; align-items: stretch;">
+        <Style src="LevelScriptableObjectCustomInspector.uss" />
+        <ui:Label text="Level Preview" name="header" />
+        <ui:VisualElement name="grid-container" style="justify-content: center;">
+            <ui:VisualElement name="grid-info">
+                <ui:VisualElement name="grid-info-width" class="grid-info-container">
+                    <ui:Label text="Grid width:" name="width-label" />
+                    <ui:Label text="0" name="width-value" />
+                </ui:VisualElement>
+                <ui:VisualElement name="grid-info-height" class="grid-info-container">
+                    <ui:Label text="Grid height:" name="height-label" />
+                    <ui:Label text="0" name="height-value" />
+                </ui:VisualElement>
+                <ui:VisualElement name="grid-info-name" class="grid-info-container">
+                    <ui:Label text="Level name:" name="name-label" />
+                    <ui:Label text="name" name="name-value" style="white-space: normal; -unity-font-style: bold;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="cells-container" />
+        </ui:VisualElement>
+        <ui:Button text="Edit Level" name="open-editor-button" />
+    </ui:VisualElement>
+</ui:UXML>

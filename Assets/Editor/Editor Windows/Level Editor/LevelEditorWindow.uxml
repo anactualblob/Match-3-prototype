@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:Label text="Level Editor" name="window-title" class="label">
+        <Style src="LevelEditorWindow.uss" />
+    </ui:Label>
+    <ui:VisualElement name="editor-body" class="verical-container container-vertical-flow vertical-flow-container" style="flex-grow: 1; flex-direction: row;">
+        <Style src="LevelEditorWindow.uss" />
+        <ui:VisualElement name="grid" class="container-horizontal-flow horizontal-flow-container" style="flex-grow: 1; background-color: rgb(204, 204, 204);" />
+        <ui:VisualElement name="grid-options" class="container-horizontal-flow horizontal-flow-container" style="width: 35%; background-color: rgb(164, 164, 164); min-width: 230px;">
+            <ui:VisualElement name="general-options" class="options-container" style="height: auto;">
+                <ui:Label text="General Level Options" name="general-options-header" class="label options-header" />
+                <ui:TextField picking-mode="Ignore" label="Level name" name="name-input" style="margin-bottom: 10px; margin-top: 3px;" />
+                <uie:IntegerField label="Grid Width" value="0" name="width-input" />
+                <uie:IntegerField label="Grid Height" value="0" name="height-input" class="general-options-field" />
+            </ui:VisualElement>
+            <ui:VisualElement name="cell-options" class="options-container" style="flex-grow: 1;">
+                <ui:Label text="Selected Cell Options" name="cell-options-header" class="options-header label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="saving-container" class="container-vertical-flow vertical-flow-container" style="padding-bottom: 0; flex-direction: row;">
+        <Style src="LevelEditorWindow.uss" />
+        <ui:Toggle label="Auto-save changes" name="autosave-toggle" />
+        <ui:Button text="Save Level" name="save-button" style="min-height: 30px; flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>
