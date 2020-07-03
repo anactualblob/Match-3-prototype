@@ -79,11 +79,11 @@ public class LevelEditorWindow : EditorWindow
         serializedLevel.FindProperty("levelName").stringValue = name;
 
         SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
+        gridProperty.ClearArray();
         for (int i = 0; i < gridWidth * gridHeight; ++i)
         {
             gridProperty.InsertArrayElementAtIndex(i);
         }
-            
 
         //SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
         //gridProperty.ClearArray();
@@ -110,8 +110,8 @@ public class LevelEditorWindow : EditorWindow
         //
         //    serializedCell.FindPropertyRelative("content").enumValueIndex = (int)grid[gridX, gridY].content;
         //}
-           
-       
+
+
         serializedLevel.ApplyModifiedProperties();
     }
 
