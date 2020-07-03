@@ -17,7 +17,7 @@
                     <ui:Label text="name" name="name-value" style="white-space: normal; -unity-font-style: bold;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="cells-container" />
+            <ui:VisualElement name="cells-container" style="flex-direction: column;" />
         </ui:VisualElement>
         <ui:Button text="Edit Level" name="open-editor-button" />
     </ui:VisualElement>

@@ -4,7 +4,7 @@
     </ui:Label>
     <ui:VisualElement name="editor-body" class="verical-container container-vertical-flow vertical-flow-container" style="flex-grow: 1; flex-direction: row;">
         <Style src="LevelEditorWindow.uss" />
-        <ui:VisualElement name="grid" class="container-horizontal-flow horizontal-flow-container" style="flex-grow: 1; background-color: rgb(204, 204, 204);" />
+        <ui:VisualElement name="grid" class="container-horizontal-flow horizontal-flow-container" style="flex-grow: 1; background-color: rgb(204, 204, 204); align-items: center; justify-content: center;" />
         <ui:VisualElement name="grid-options" class="container-horizontal-flow horizontal-flow-container" style="width: 35%; background-color: rgb(164, 164, 164); min-width: 230px;">
             <ui:VisualElement name="general-options" class="options-container" style="height: auto;">
                 <ui:Label text="General Level Options" name="general-options-header" class="label options-header" />
@@ -14,6 +14,15 @@
             </ui:VisualElement>
             <ui:VisualElement name="cell-options" class="options-container" style="flex-grow: 1;">
                 <ui:Label text="Selected Cell Options" name="cell-options-header" class="options-header label" />
+                <ui:VisualElement style="flex-direction: row; justify-content: center;">
+                    <ui:Label text="Selected cell: " />
+                    <ui:Label text="none" name="selected-cell-coordinates" />
+                </ui:VisualElement>
+                <ui:VisualElement name="cell-options-main">
+                    <ui:Toggle label="Hole" name="cell-hole-input" />
+                    <ui:Toggle label="Set the cell contents ?" name="cell-preset-input" style="margin-top: 10px;" />
+                    <uie:EnumField label="Cell content" name="cell-content-input" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

@@ -5,7 +5,7 @@ VisualElement {
     font-size: 25px;
     -unity-text-align: middle-left;
     border-bottom-width: 2px;
-    border-bottom-color: rgba(118, 118, 118, 255);
+    border-bottom-color: rgb(118, 118, 118);
     margin-bottom: 10px;
     margin-left: 5px;
     margin-right: 5px;
@@ -57,12 +57,11 @@ VisualElement {
     width: 90%;
     min-width: 250px;
     min-height: 350px;
-    border-left-color: rgba(115, 115, 115, 255);
-    border-right-color: rgba(115, 115, 115, 255);
-    border-top-color: rgba(115, 115, 115, 255);
-    border-bottom-color: rgba(115, 115, 115, 255);
+    border-left-color: rgb(115, 115, 115);
+    border-right-color: rgb(115, 115, 115);
+    border-top-color: rgb(115, 115, 115);
+    border-bottom-color: rgb(115, 115, 115);
     max-height: 600px;
     max-width: 500px;
     flex-grow: 0;
 }
-

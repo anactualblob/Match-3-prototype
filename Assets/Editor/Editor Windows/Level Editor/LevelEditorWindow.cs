@@ -10,8 +10,9 @@ public class LevelEditorWindow : EditorWindow
     int gridWidth;
 
     bool autosave;
+    new string name;
 
-    string name;
+    EditableGridCell[,] grid;
 
 
 
@@ -25,6 +26,14 @@ public class LevelEditorWindow : EditorWindow
     VisualTreeAsset tree;
     StyleSheet stylesheet;
 
+    VisualTreeAsset cellTemplate;
+
+    public static void EditLevel(LevelScriptableObject levelToEdit)
+    {
+        LevelEditorWindow window = GetWindow<LevelEditorWindow>();
+        window.serializedLevel = new SerializedObject(levelToEdit);
+        window.SetupEditor();
+    }
 
     private void OnEnable()
     {
@@ -32,6 +41,8 @@ public class LevelEditorWindow : EditorWindow
 
         tree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/Editor Windows/Level Editor/LevelEditorWindow.uxml");
         stylesheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Editor/Editor Windows/Level Editor/LevelEditorWindow.uss");
+
+        cellTemplate = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/Editor/UXML Templates/LevelCell.uxml");
 
         root.styleSheets.Add(stylesheet);
         tree.CloneTree(root);
@@ -45,16 +56,22 @@ public class LevelEditorWindow : EditorWindow
         //{
         //    root.Q<Label>("no-level-warning").visible = false;
         //}
-        
     }
 
-    
 
     void Save()
     {
         serializedLevel.FindProperty("gridWidth").intValue = gridWidth;
         serializedLevel.FindProperty("gridHeight").intValue = gridHeight;
         serializedLevel.FindProperty("levelName").stringValue = name;
+
+        SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
+        for (int i = 0; i < gridWidth * gridHeight; ++i)
+        {
+            gridProperty.InsertArrayElementAtIndex(i);
+        }
+            
+
         serializedLevel.ApplyModifiedProperties();
     }
 
@@ -88,6 +105,7 @@ public class LevelEditorWindow : EditorWindow
                 serializedLevel.FindProperty("gridWidth").intValue = evt.newValue;
                 serializedLevel.ApplyModifiedProperties();
             }
+            SetupGrid();
         });
 
         // wiring fields, internal variables and serialized properties for height
@@ -101,6 +119,7 @@ public class LevelEditorWindow : EditorWindow
                 serializedLevel.FindProperty("gridHeight").intValue = gridHeight;
                 serializedLevel.ApplyModifiedProperties();
             }
+            SetupGrid();
         });
         
         // toggle autosave bool
@@ -109,9 +128,57 @@ public class LevelEditorWindow : EditorWindow
             root.Q<Button>(name = "save-button").visible = !evt.newValue;
             autosave = evt.newValue;
         });
-        
+
         // save changes to serializedLevel when clicking the save button
         root.Q<Button>(name = "save-button").clickable.clicked += () => Save();
+
+        SetupGrid();
+    }
+
+
+    void SetupGrid()
+    {
+        grid = new EditableGridCell[gridWidth, gridHeight];
+
+        VisualElement cellContainer = rootVisualElement.Q<VisualElement>("grid");
+        cellContainer.Clear();
+    
+        for (int j= 0; j < gridHeight; ++j)
+        {
+
+            VisualElement row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+
+            for (int i = 0; i < gridWidth; ++i)
+            {
+                VisualElement cell = new VisualElement();
+                cellTemplate.CloneTree(cell);
+
+                cell.name = i + " " + j;
+
+                row.Add(cell);
+
+
+
+                //make new grid cell
+                grid[i, j] = new EditableGridCell()
+                {
+                    x = i,
+                    y = j,
+
+                    presetContent = false,
+                    content = LevelEditorCellContent.random,
+                    hole = false,
+
+                    displayCell = cell
+                };
+
+                
+
+
+            }
+            cellContainer.Add(row);
+        }
     }
 
 
@@ -127,15 +194,27 @@ public class LevelEditorWindow : EditorWindow
     //
     //}
 
-
-
-    public static void EditLevel(LevelScriptableObject levelToEdit)
+    struct EditableGridCell
     {
-        LevelEditorWindow window = GetWindow<LevelEditorWindow>();
+        public int x, y;
 
-        window.serializedLevel = new SerializedObject(levelToEdit);
+        public bool hole;
 
-        window.SetupEditor();
+        public bool presetContent;
+        public LevelEditorCellContent content;
 
+        public VisualElement displayCell;
+
+
+    }
+
+    enum LevelEditorCellContent
+    {
+        random = 0,
+        candy_blue = 1,
+        candy_red = 2,
+        candy_green = 3,
+        candy_orange = 4,
+        candy_yellow = 5
     }
 }
