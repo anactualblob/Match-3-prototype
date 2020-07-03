@@ -9,11 +9,10 @@ public class LevelScriptableObjectCustomInspector : Editor
     // this custom inspector should only display the grid and provide a button 
     //    to open the Level Editor window and pass it the inspected Level instance
 
-
+    // primary data
+    LevelScriptableObject inspectedLevel;
     int width, height;
-
     string levelName;
-
     LevelScriptableObject.SerializedGridCell[] grid;
 
 
@@ -23,7 +22,6 @@ public class LevelScriptableObjectCustomInspector : Editor
 
     VisualTreeAsset cellTemplate;
 
-    LevelScriptableObject inspectedLevel;
 
     private void OnEnable()
     {
@@ -85,18 +83,17 @@ public class LevelScriptableObjectCustomInspector : Editor
 
                 cell.name = i + " " + j;
 
-                cell.RemoveFromClassList("cell:hover");
 
                 row.Add(cell);
 
+
                 // set the display of the cell visual element according to the cell in the grid array
                 // position of the cell in the array given by : (j * height + i)
-
-                if (grid[j * height + i].hole)
-                {
-                    cell.style.visibility = Visibility.Hidden;
-                }
-
+                //if (grid[j * height + i].hole)
+                //{
+                //    VisualElement bg = cell.Q<VisualElement>("Cell");
+                //    bg.style.visibility = Visibility.Hidden;
+                //}
 
             }
             cellContainer.Add(row);

@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 public class LevelEditorWindow : EditorWindow
 {
 #pragma warning disable 0649
+
     int gridHeight;
     int gridWidth;
 
@@ -13,7 +14,19 @@ public class LevelEditorWindow : EditorWindow
     new string name;
 
     EditableGridCell[,] grid;
+    Vector2Int selectedCell;
 
+    enum Tools
+    {
+        none,
+        hole,
+        reset,
+        candy_blue
+    }
+
+    Tools activeTool;
+
+    
 
 
     LevelScriptableObject editedLevel;
@@ -72,6 +85,33 @@ public class LevelEditorWindow : EditorWindow
         }
             
 
+        //SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
+        //gridProperty.ClearArray();
+        //gridProperty.arraySize = gridWidth * gridHeight;
+        //
+        //for (int i = 0; i < gridProperty.arraySize; ++i)
+        //{
+        //    gridProperty.InsertArrayElementAtIndex(i);
+        //
+        //    SerializedProperty serializedCell = gridProperty.GetArrayElementAtIndex(i);
+        //
+        //    // i = y * height + x
+        //
+        //    int gridX = 0; // i / gridHeight;
+        //    int gridY = 0; // i % gridWidth;
+        //
+        //
+        //    serializedCell.FindPropertyRelative("x").intValue = grid[gridX, gridY].x;
+        //    serializedCell.FindPropertyRelative("y").intValue = grid[gridX, gridY].y;
+        //    
+        //    serializedCell.FindPropertyRelative("hole").boolValue = grid[gridX, gridY].hole;
+        //
+        //    serializedCell.FindPropertyRelative("presetContent").boolValue = grid[gridX, gridY].presetContent;
+        //
+        //    serializedCell.FindPropertyRelative("content").enumValueIndex = (int)grid[gridX, gridY].content;
+        //}
+           
+       
         serializedLevel.ApplyModifiedProperties();
     }
 
@@ -88,8 +128,7 @@ public class LevelEditorWindow : EditorWindow
             name = evt.newValue;
             if (autosave)
             {
-                serializedLevel.FindProperty("levelName").stringValue = evt.newValue;
-                serializedLevel.ApplyModifiedProperties();
+                Save();
             }
         });
         
@@ -102,8 +141,7 @@ public class LevelEditorWindow : EditorWindow
             gridWidth = evt.newValue;
             if (autosave)
             {
-                serializedLevel.FindProperty("gridWidth").intValue = evt.newValue;
-                serializedLevel.ApplyModifiedProperties();
+                Save();
             }
             SetupGrid();
         });
@@ -111,17 +149,39 @@ public class LevelEditorWindow : EditorWindow
         // wiring fields, internal variables and serialized properties for height
         IntegerField heightField = root.Q<IntegerField>(name = "height-input");
         heightField.value = gridHeight = serializedLevel.FindProperty("gridHeight").intValue;
+
         heightField.RegisterValueChangedCallback(evt =>
         {
             gridHeight = evt.newValue;
             if (autosave)
             {
-                serializedLevel.FindProperty("gridHeight").intValue = gridHeight;
-                serializedLevel.ApplyModifiedProperties();
+                Save();
             }
             SetupGrid();
         });
+
+
+
+        ToolbarButton holeToolButton = root.Q<ToolbarButton>("tool-hole");
+        holeToolButton.clickable.clicked += () =>
+        {
+            Toolbar toolbar = root.Q<Toolbar>("toolbar");
+            foreach (VisualElement e in toolbar.Children())
+            {
+                e.RemoveFromClassList("tool-active");
+                e.AddToClassList("tool-inactive");
+            }
+
+            holeToolButton.AddToClassList("tool-active");
+            holeToolButton.RemoveFromClassList("tool-inactive");
+            activeTool = Tools.hole;
+
+            
+        };
+
         
+
+
         // toggle autosave bool
         root.Q<Toggle>("autosave-toggle").RegisterValueChangedCallback(evt =>
         {
@@ -131,6 +191,7 @@ public class LevelEditorWindow : EditorWindow
 
         // save changes to serializedLevel when clicking the save button
         root.Q<Button>(name = "save-button").clickable.clicked += () => Save();
+
 
         SetupGrid();
     }
@@ -153,12 +214,8 @@ public class LevelEditorWindow : EditorWindow
             {
                 VisualElement cell = new VisualElement();
                 cellTemplate.CloneTree(cell);
-
                 cell.name = i + " " + j;
-
                 row.Add(cell);
-
-
 
                 //make new grid cell
                 grid[i, j] = new EditableGridCell()
@@ -173,10 +230,74 @@ public class LevelEditorWindow : EditorWindow
                     displayCell = cell
                 };
 
+                // TOOL HANDLING
+                cell.RegisterCallback<MouseDownEvent>(evt =>
+                {
+                    //it's dumb but whatevs
+                    int x = int.Parse(cell.name.Split(' ')[0]);
+                    int y = int.Parse(cell.name.Split(' ')[1]);
+
+                    
+
+                    if (evt.button == 0) // left click
+                    {
+                        switch (activeTool)
+                        {
+                            case Tools.none:
+                                break;
+
+                            case Tools.hole:
+                                // toggle cell visibility
+                                VisualElement bg = cell.Q<VisualElement>("Cell");
+                                bg.style.visibility = bg.style.visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
+
+                                grid[x, y].hole = (bg.style.visibility == Visibility.Hidden);
+                                break;
+
+                            case Tools.reset:
+                                break;
+
+                            case Tools.candy_blue:
+                                break;
+                        }
+                    }
+
+                    if (autosave) Save();
+                });
+
+
                 
 
 
+                // load cell
+                //SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
+                ////if (gridProperty.arraySize == gridHeight * gridWidth)
+                ////{
+                ////Debug.Log("loading cell");
+                //
+                ////Debug.Log(j * gridHeight + i);
+                //SerializedProperty serializedCell = gridProperty.GetArrayElementAtIndex(j * gridHeight + i);
+                //
+                //grid[i, j].x = serializedCell.FindPropertyRelative("x").intValue;
+                //grid[i, j].y = serializedCell.FindPropertyRelative("y").intValue;
+                //
+                //
+                //grid[i, j].hole = serializedCell.FindPropertyRelative("hole").boolValue;
+                //grid[i, j].presetContent = serializedCell.FindPropertyRelative("presetContent").boolValue;
+                //grid[i, j].content = (LevelEditorCellContent)serializedCell.FindPropertyRelative("content").enumValueIndex;
+                //
+                ////}
+                //
+                //
+                //if (grid[i, j].hole)
+                //{
+                //    cell.style.visibility = Visibility.Hidden;
+                //}
+
+
+
             }
+
             cellContainer.Add(row);
         }
     }
@@ -204,8 +325,6 @@ public class LevelEditorWindow : EditorWindow
         public LevelEditorCellContent content;
 
         public VisualElement displayCell;
-
-
     }
 
     enum LevelEditorCellContent
@@ -217,4 +336,5 @@ public class LevelEditorWindow : EditorWindow
         candy_orange = 4,
         candy_yellow = 5
     }
+
 }
