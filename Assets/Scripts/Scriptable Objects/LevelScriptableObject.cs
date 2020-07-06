@@ -7,9 +7,7 @@ public class LevelScriptableObject : ScriptableObject
 {
     public int gridHeight;
     public int gridWidth;
-
     public string levelName;
-
     public SerializedGridCell[] grid;
 
     public LevelScriptableObject(int width, int height, SerializedGridCell[] grid)
@@ -18,8 +16,6 @@ public class LevelScriptableObject : ScriptableObject
         gridHeight = height;
         gridWidth = width;
     }
-
-
 
 
     [System.Serializable]
