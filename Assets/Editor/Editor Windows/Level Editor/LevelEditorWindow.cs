@@ -243,7 +243,7 @@ public class LevelEditorWindow : EditorWindow
                 grid[i, j].y = serializedCell.FindPropertyRelative("y").intValue;
                 grid[i, j].hole = serializedCell.FindPropertyRelative("hole").boolValue;
                 grid[i, j].presetContent = serializedCell.FindPropertyRelative("presetContent").boolValue;
-                grid[i, j].content = (LevelEditorCellContent)serializedCell.FindPropertyRelative("content").enumValueIndex;
+                grid[i, j].content = (LevelEditorCellContent)serializedCell.FindPropertyRelative("content").intValue;
                 
                 // if the cell we loaded is a hole, update its display
                 if (grid[i, j].hole)
@@ -254,6 +254,45 @@ public class LevelEditorWindow : EditorWindow
             }
             cellContainer.Add(row);
         }
+    }
+
+    /// <summary>
+    /// Apply the editor's state and data to the serializedLevel and save it.
+    /// </summary>
+    void Save()
+    {
+        // Set values of serializedLevel's top-level properties
+        serializedLevel.FindProperty("gridWidth").intValue = gridWidth;
+        serializedLevel.FindProperty("gridHeight").intValue = gridHeight;
+        serializedLevel.FindProperty("levelName").stringValue = name;
+
+        // get the grid property from the serializedLevel and clear its contents
+        SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
+        gridProperty.ClearArray();
+        
+        // fill the serializedLevel's grid with data from the window's grid[,]
+        for (int i = 0; i < gridWidth * gridHeight; ++i)
+        {
+            gridProperty.InsertArrayElementAtIndex(i);
+            SerializedProperty serializedCell = gridProperty.GetArrayElementAtIndex(i);
+
+            // find x and y grid positions of the cell with he formula : i = x * gridHeight + y
+            int gridX = i / gridHeight;
+            int gridY = i % gridHeight;
+
+
+            serializedCell.FindPropertyRelative("x").intValue = grid[gridX, gridY].x;
+            serializedCell.FindPropertyRelative("y").intValue = grid[gridX, gridY].y;
+            
+            serializedCell.FindPropertyRelative("hole").boolValue = grid[gridX, gridY].hole;
+        
+            serializedCell.FindPropertyRelative("presetContent").boolValue = grid[gridX, gridY].presetContent;
+
+            serializedCell.FindPropertyRelative("content").intValue = (int)grid[gridX, gridY].content;
+        }
+
+        // apply the modified properties to the original SerializedObject
+        serializedLevel.ApplyModifiedProperties();
     }
 
     /// <summary>
@@ -297,45 +336,6 @@ public class LevelEditorWindow : EditorWindow
         if (autosave) Save();
     }
 
-
-    /// <summary>
-    /// Apply the editor's state and data to the serializedLevel and save it.
-    /// </summary>
-    void Save()
-    {
-        // Set values of serializedLevel's top-level properties
-        serializedLevel.FindProperty("gridWidth").intValue = gridWidth;
-        serializedLevel.FindProperty("gridHeight").intValue = gridHeight;
-        serializedLevel.FindProperty("levelName").stringValue = name;
-
-        // get the grid property from the serializedLevel and clear its contents
-        SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
-        gridProperty.ClearArray();
-        
-        // fill the serializedLevel's grid with data from the window's grid[,]
-        for (int i = 0; i < gridWidth * gridHeight; ++i)
-        {
-            gridProperty.InsertArrayElementAtIndex(i);
-            SerializedProperty serializedCell = gridProperty.GetArrayElementAtIndex(i);
-
-            // find x and y grid positions of the cell with he formula : i = x * gridHeight + y
-            int gridX = i / gridHeight;
-            int gridY = i % gridHeight;
-
-
-            serializedCell.FindPropertyRelative("x").intValue = grid[gridX, gridY].x;
-            serializedCell.FindPropertyRelative("y").intValue = grid[gridX, gridY].y;
-            
-            serializedCell.FindPropertyRelative("hole").boolValue = grid[gridX, gridY].hole;
-        
-            serializedCell.FindPropertyRelative("presetContent").boolValue = grid[gridX, gridY].presetContent;
-        
-            serializedCell.FindPropertyRelative("content").enumValueIndex = (int)grid[gridX, gridY].content;
-        }
-
-        // apply the modified properties to the original SerializedObject
-        serializedLevel.ApplyModifiedProperties();
-    }
 
 
     struct EditableGridCell
