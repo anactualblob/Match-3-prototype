@@ -25,7 +25,7 @@ public class GridManager : MonoBehaviour
 
 
 
-    [SerializeField] TextAsset levelJSON = null;
+    [SerializeField] LevelScriptableObject level = null;
 
 
     TouchInfo primaryTouchInfo;
@@ -190,6 +190,11 @@ public class GridManager : MonoBehaviour
             {
                 for (int i = GRID_WIDTH - 1; i >= 0; --i)
                 {
+                    if (grid[i, j].cellContent == CellContents.hole)
+                    {
+                        continue;
+                    }
+
                     // if we find a non empty cell above an empty cell
                     if (grid[i, j+1].cellContent == CellContents.empty && grid[i, j].cellContent != CellContents.empty)
                     {
@@ -310,15 +315,15 @@ public class GridManager : MonoBehaviour
 
         List<Vector2Int> matches = new List<Vector2Int>();
 
-        if (cell.cellContent == CellContents.empty) return matches;
+        if (cell.cellContent == CellContents.empty || cell.cellContent == CellContents.hole) return matches;
 
 
         // find matches of type XOO
         for (int i = 0; i<directions.Length; ++i)
         {
+            // if the cell we need to check is outside the grid, skip to the next loop iteration
             if (cell.x + directions[i].x >= GRID_WIDTH || cell.x + directions[i].x < 0 || cell.y + directions[i].y >= GRID_HEIGHT || cell.y + directions[i].y < 0)
             {
-                // if the cell we need to check is outside the grid, skip to the next loop iteration
                 continue;
             }
 
@@ -326,8 +331,7 @@ public class GridManager : MonoBehaviour
 
             if (cell.cellContent == checkedCell.cellContent)
             {
-
-                // fill directionalMatches array in order to check for matches of type OXO
+                // fill directionalMatches array in order to check for matches of type OXO later
                 directionalMatches[i, 0] = new Vector2Int(checkedCell.x, checkedCell.y);
 
                 if (checkedCell.x + directions[i].x >= GRID_WIDTH || checkedCell.x + directions[i].x < 0 || checkedCell.y + directions[i].y >= GRID_HEIGHT || checkedCell.y + directions[i].y < 0)
@@ -343,7 +347,7 @@ public class GridManager : MonoBehaviour
                     matches.Add(new Vector2Int(checkedCell.x, checkedCell.y));
                     matches.Add(new Vector2Int(thirdCell.x, thirdCell.y));
 
-                    // fill directionalMatches array in order to check for matches of type OXO
+                    // fill directionalMatches array in order to check for matches of type OXO later
                     directionalMatches[i, 1] = new Vector2Int(thirdCell.x, thirdCell.y);
                 }
             }
@@ -354,7 +358,7 @@ public class GridManager : MonoBehaviour
         // Find matches of type OXO
 
         // The way this works is that we've populated a directionnalMatches array of 4 rows & 2 columns in the code above. 
-        // Each row corresponds to a direction, in the order Up Right Down Left. We check if we stored a match by comparing
+        // Each row corresponds to a direction, in the order: Up Right Down Left. We check if we stored a match by comparing
         //    an item of the array to a (-1,-1) vector, which we filled the array with after having created it. If it's not
         //    (-1,-1), the item is a match because it has overwritten the default (-1,-1).
         // So we first check if the first items of rows 0 and 2 (directions up and down) are both a match. If yes, that means
@@ -424,25 +428,73 @@ public class GridManager : MonoBehaviour
     {
         GridDisplayer.TeardownGridDisplay();
 
-        grid = new GridCell[GRID_WIDTH, GRID_HEIGHT];
-
-
-        for (int i = 0; i < GRID_WIDTH; ++i)
+        if (level == null)
         {
-            for (int j = 0; j < GRID_HEIGHT; ++j)
+            // create random grid
+            grid = new GridCell[GRID_WIDTH, GRID_HEIGHT];
+            for (int i = 0; i < GRID_WIDTH; ++i)
             {
-                grid[i, j] = new GridCell()
+                for (int j = 0; j < GRID_HEIGHT; ++j)
+                {
+                    grid[i, j] = new GridCell()
+                    {
+                        visible = true,
+                        empty = false,
+                        x = i,
+                        y = j,
+
+                        // FIND A BETTER WAY TO DO THIS
+                        cellContent = (CellContents)Random.Range(1, 6)
+                    };
+                }
+            }
+
+        }
+        else
+        {
+            // load info from level
+            GRID_WIDTH = level.gridWidth;
+            GRID_HEIGHT = level.gridHeight;
+
+            grid = new GridCell[GRID_WIDTH, GRID_HEIGHT];
+
+            // go through level.grid, a 1D array
+            for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; ++i)
+            {
+                // find x and y 2D grid positions of the cell at i with the formula : i = x * gridHeight + y
+                int gridX = i / gridHeight;
+                int gridY = i % gridHeight;
+
+                grid[gridX, gridY] = new GridCell()
                 {
                     visible = true,
                     empty = false,
-                    x = i,
-                    y = j,
-
-                    // FIND A BETTER WAY TO DO THIS
-                    cellContent = (CellContents)Random.Range(1, 6)
+                    x = gridX,
+                    y = gridY
                 };
+
+                // cell contents
+                if (level.grid[i].hole)
+                {
+                    grid[gridX, gridY].cellContent = CellContents.hole;
+                }
+                else 
+                {
+                    if (level.grid[i].content == CellContents.empty)
+                    {
+                        // FIND A BETTER WAY TO DO THIS
+                        grid[gridX, gridY].cellContent = (CellContents)Random.Range(1, 6);
+                    }
+                    else
+                    {
+                        grid[gridX, gridY].cellContent = level.grid[i].content;
+                    }
+                }
+                
             }
+
         }
+        
 
 
         // INITIAL MATCH DETECTION FOR CLEAN GRID

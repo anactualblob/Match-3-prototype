@@ -10,6 +10,8 @@ public class LevelScriptableObject : ScriptableObject
     public string levelName;
     public SerializedGridCell[] grid;
 
+    
+
     public LevelScriptableObject(int width, int height, SerializedGridCell[] grid)
     {
         this.grid = grid;
