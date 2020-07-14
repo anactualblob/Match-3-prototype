@@ -48,7 +48,7 @@ public class GridElement_Candy : GridElement
     bool wasSwapped = false;
     bool registered = false;
 
-    // possibly useless now
+    
     public enum CandyColor
     {
         red,

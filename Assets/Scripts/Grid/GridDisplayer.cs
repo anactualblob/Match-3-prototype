@@ -202,6 +202,8 @@ public class GridDisplayer : MonoBehaviour
         {
             for (int j = 0; j < GridManager.GRID_HEIGHT; ++j)
             {
+                current = null; 
+
                 if (GridManager.GRID[i, j].cellContent != GridManager.CellContents.hole)
                 {
                     // instantiate cells and set their sizes
@@ -259,7 +261,17 @@ public class GridDisplayer : MonoBehaviour
 
     void GridDisplayTeardown()
     {
-        // return all grid gameobjects to their pools, and destroy cell backgrounds.
+        //// return all grid gameobjects to their pools, and destroy cell backgrounds.
+        //foreach (Transform t in gridElementContainer)
+        //{
+        //    ReturnCandyToPool( t.GetComponent<GridElement_Candy>() );
+        //    Debug.Log("returned to pool");
+        //}
+        //
+        //foreach (Transform t in cellContainer)
+        //{
+        //    Destroy(t.gameObject);
+        //}
     }
 
     // static wrapper for calling GridDisplayInit from external scripts

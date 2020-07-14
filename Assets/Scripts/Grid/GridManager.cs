@@ -195,30 +195,56 @@ public class GridManager : MonoBehaviour
                         continue;
                     }
 
-                    // if we find a non empty cell above an empty cell
-                    if (grid[i, j+1].cellContent == CellContents.empty && grid[i, j].cellContent != CellContents.empty)
+                    // if we find a non empty cell above an empty cell or a hole
+                    if ( (grid[i, j+1].cellContent == CellContents.empty || grid[i, j + 1].cellContent == CellContents.hole) && grid[i, j].cellContent != CellContents.empty)
                     {
-                        // the candy will always fall at least one cell
                         int dist = 0;
-
+                        int holeCounter = 0;
+                    
                         // go down until we find a cell that's above a non empty cell or at the bottom of the grid
                         for (int y = j+1; y < GRID_HEIGHT; ++y)
                         {
-                            dist++;
+                            if (grid[i, y].cellContent == CellContents.hole)
+                            {
+                                // if the cell we're checking is a hole, we don't want to add to dist just yet in 
+                                //    case its holes all the way down, in which case the candy should not drop, so
+                                //    we keep a separate counter for holes
+                                holeCounter++;
+                                
+                            }
+                            else
+                            {
+                                dist++;
+                    
+                                // if we've hit a cell that's not a hole and the holeCounter is greater than 0,
+                                //    that means the ccandy can fall down through the holes. we add the holecounter
+                                //    to dist and we reset it in case we find more holes lower in the grid.
+                                if (holeCounter > 0)
+                                {
+                                    dist += holeCounter;
+                                    holeCounter = 0;
+                                }
+                            }
+                          
                             if (y<GRID_HEIGHT-1)
                             {
-                                if (grid[i, y + 1].cellContent != CellContents.empty) break; 
+                                // break if the cell below the one we're checking is not empty and not a hole
+                                if (grid[i, y + 1].cellContent != CellContents.empty && grid[i, y + 1].cellContent != CellContents.hole) break;
                             }
                         }
-
+                    
                         // dist is now the number of empty cells between the cell we're at and the next non-empty cell under it
                         // we call Fall on grid[i,j] and pass it dist
-                        if (grid[i, j].Fall != null) grid[i, j].Fall(dist);
 
-                        grid[i, j + dist].cellContent = grid[i, j].cellContent;
-                        grid[i, j].cellContent = CellContents.empty;
+                        if (dist > 0)
+                        {
+                            if (grid[i, j].Fall != null) grid[i, j].Fall(dist);
 
-                        candiesFellThisFrame = true;
+                            grid[i, j + dist].cellContent = grid[i, j].cellContent;
+                            grid[i, j].cellContent = CellContents.empty;
+
+                            candiesFellThisFrame = true;
+                        }
                     }
                 }
             }
@@ -480,10 +506,10 @@ public class GridManager : MonoBehaviour
                 }
                 else 
                 {
+                    // if the current cell is empty in the level SO, it hasn't been defined and we should fill it with a random color
                     if (level.grid[i].content == CellContents.empty)
                     {
-                        // FIND A BETTER WAY TO DO THIS
-                        grid[gridX, gridY].cellContent = (CellContents)Random.Range(1, 6);
+                        grid[gridX, gridY].cellContent = level.GetRandomColor();
                     }
                     else
                     {
@@ -505,7 +531,16 @@ public class GridManager : MonoBehaviour
             for (int i = 0; i < allMatches.Count; i++)
             {
                 Vector2Int cell = allMatches[i];
-                grid[cell.x, cell.y].cellContent = (CellContents)Random.Range(1, 6);
+                
+                if (level != null)
+                {
+                    grid[cell.x, cell.y].cellContent = level.GetRandomColor();
+                }
+                else
+                {
+                    grid[cell.x, cell.y].cellContent = (CellContents)Random.Range(1, 6);
+                }
+
                 allMatches.Remove(cell);
             }
 

@@ -4,7 +4,7 @@
     </ui:Label>
     <ui:VisualElement name="editor-body" class="verical-container container-vertical-flow vertical-flow-container" style="flex-grow: 1; flex-direction: row;">
         <Style src="LevelEditorWindow.uss" />
-        <ui:VisualElement name="grid" class="container-horizontal-flow horizontal-flow-container tool" style="flex-grow: 1; background-color: rgb(204, 204, 204); align-items: center; justify-content: center;" />
+        <ui:VisualElement name="grid" class="container-horizontal-flow horizontal-flow-container" style="flex-grow: 1; background-color: rgb(204, 204, 204); align-items: center; justify-content: center;" />
         <ui:VisualElement name="grid-options" class="container-horizontal-flow horizontal-flow-container" style="width: 35%; background-color: rgb(164, 164, 164); min-width: 230px;">
             <ui:VisualElement name="general-options" class="options-container" style="height: auto;">
                 <ui:Label text="General Level Options" name="general-options-header" class="label options-header" />
@@ -27,7 +27,13 @@
             <ui:VisualElement name="toolbar-container" class="options-container">
                 <ui:Label text="Tools" name="toolbar-header" class="options-header" />
                 <uie:Toolbar name="toolbar" style="flex-direction: column; height: auto;">
-                    <uie:ToolbarButton text="Hole" name="tool-hole" class="tool-inactive" />
+                    <uie:ToolbarButton text="Hole" name="tool-hole" class="tool-inactive tool-button" />
+                    <ui:VisualElement name="toolbar-space" class="toolbar-spacer" />
+                    <uie:ToolbarButton text="Blue Candy" name="tool-candy-blue" class="tool-inactive tool-button" />
+                    <uie:ToolbarButton text="Red Candy" name="tool-candy-red" class="tool-inactive tool-button" />
+                    <uie:ToolbarButton text="Green Candy" name="tool-candy-green" class="tool-inactive tool-button" />
+                    <uie:ToolbarButton text="Yellow Candy" name="tool-candy-yellow" class="tool-inactive tool-button" />
+                    <uie:ToolbarButton text="Orange Candy" name="tool-candy-orange" class="tool-inactive tool-button" />
                 </uie:Toolbar>
             </ui:VisualElement>
         </ui:VisualElement>

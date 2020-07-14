@@ -36,8 +36,6 @@ public class LevelScriptableObjectCustomInspector : Editor
         root.styleSheets.Add(stylesheet);
     }
 
-
-
     public override VisualElement CreateInspectorGUI()
     {
         // display the UIElements assets loaded in OnEnable
@@ -62,6 +60,8 @@ public class LevelScriptableObjectCustomInspector : Editor
         // return root to display it
         return root;
     }
+
+
 
     /// <summary>
     /// Display the inspectedLevel's grid.
@@ -96,12 +96,56 @@ public class LevelScriptableObjectCustomInspector : Editor
                 }
                 else
                 {
+                    VisualElement cellBackground = cell.Q<VisualElement>("Cell");
+                    RemoveCandyClassesFromCell(cellBackground);
+
                     // add other cases for cell display here
+                    switch (grid[i * height + j].content)
+                    {
+                        case GridManager.CellContents.hole:
+                            break;
+
+                        case GridManager.CellContents.empty:
+                            cellBackground.AddToClassList("empty");
+                            break;
+
+                        case GridManager.CellContents.candy_blue:
+                            cellBackground.AddToClassList("candy-blue");
+                            break;
+
+                        case GridManager.CellContents.candy_red:
+                            cellBackground.AddToClassList("candy-red");
+                            break;
+                        case GridManager.CellContents.candy_green:
+                            cellBackground.AddToClassList("candy-green");
+                            break;
+                        case GridManager.CellContents.candy_orange:
+                            cellBackground.AddToClassList("candy-orange");
+                            break;
+                        case GridManager.CellContents.candy_yellow:
+                            cellBackground.AddToClassList("candy-yellow");
+                            break;
+                    }
                 }
             }
             cellContainer.Add(row);
         }
     }
+
+    /// <summary>
+    /// Removes all candy-related uss classes from the given cell Visual Element
+    /// </summary>
+    /// <param name="cell"></param>
+    void RemoveCandyClassesFromCell(VisualElement cell)
+    {
+        cell.RemoveFromClassList("candy-blue");
+        cell.RemoveFromClassList("candy-red");
+        cell.RemoveFromClassList("candy-green");
+        cell.RemoveFromClassList("candy-yellow");
+        cell.RemoveFromClassList("candy-orange");
+        cell.RemoveFromClassList("empty");
+    }
+
 
 
     /// <summary>

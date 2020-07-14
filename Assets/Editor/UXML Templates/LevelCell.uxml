@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
     <ui:VisualElement>
         <Style src="LevelCell.uss" />
-        <ui:VisualElement name="Cell" class="cell" style="display: flex; visibility: visible; background-color: rgb(149, 149, 149);">
-            <ui:VisualElement name="image" style="width: 100%; height: 100%;" />
+        <ui:VisualElement name="Cell" class="cell empty" style="display: flex; visibility: visible; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+            <ui:VisualElement name="image" style="margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px; width: auto; height: 100%;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

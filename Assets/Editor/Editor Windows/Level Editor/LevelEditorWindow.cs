@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
 
 public class LevelEditorWindow : EditorWindow
 {
@@ -16,13 +17,20 @@ public class LevelEditorWindow : EditorWindow
 
     EditableGridCell[,] grid;
 
+    List<LevelEditorCellContent> presetColorsList = new List<LevelEditorCellContent>();
+
+
     // tools
     enum Tools
     {
         none,
         hole,
         reset,
-        candy_blue
+        candy_blue,
+        candy_red,
+        candy_green,
+        candy_yellow,
+        candy_orange
     }
     Tools activeTool;
 
@@ -69,6 +77,7 @@ public class LevelEditorWindow : EditorWindow
         tree.CloneTree(root);
     }
 
+    #region Editor Setup
     /// <summary>
     /// Sets base UI field values and registers the appropriate callbacks.
     /// </summary>
@@ -115,31 +124,29 @@ public class LevelEditorWindow : EditorWindow
         });
 
 
-        // "homemade" button toggle for the hole tool
-        // sets the "inactive" class on all the toolbar's buttons
-        // sets the hole too as the active one if it isn't active, otherwise sets the active tool to none
-        // note : consider making this a function with a ToolbarButton arg and a Tools arg to avoid copy pasting
+        // Setup the hole toolbar button
         ToolbarButton holeToolButton = root.Q<ToolbarButton>("tool-hole");
-        holeToolButton.clickable.clicked += () =>
-        {
-            Toolbar toolbar = root.Q<Toolbar>("toolbar");
-            foreach (VisualElement e in toolbar.Children())
-            {
-                e.RemoveFromClassList("tool-active");
-                e.AddToClassList("tool-inactive");
-            }
+        SetupToolButton(holeToolButton, Tools.hole);
 
-            if (activeTool != Tools.hole)
-            {
-                holeToolButton.AddToClassList("tool-active");
-                holeToolButton.RemoveFromClassList("tool-inactive");
-                activeTool = Tools.hole;
-            }
-            else
-            {
-                activeTool = Tools.none;
-            }
-        };
+        // Setup the blue candy toolbar button
+        ToolbarButton blueCandyToolbutton = root.Q<ToolbarButton>("tool-candy-blue");
+        SetupToolButton(blueCandyToolbutton, Tools.candy_blue);
+
+        // Setup the red candy toolbar button
+        ToolbarButton redCandyToolbutton = root.Q<ToolbarButton>("tool-candy-red");
+        SetupToolButton(redCandyToolbutton, Tools.candy_red);
+
+        // Setup the green candy toolbar button
+        ToolbarButton greenCandyToolbutton = root.Q<ToolbarButton>("tool-candy-green");
+        SetupToolButton(greenCandyToolbutton, Tools.candy_green);
+
+        // Setup the yellow candy toolbar button
+        ToolbarButton yellowCandyToolbutton = root.Q<ToolbarButton>("tool-candy-yellow");
+        SetupToolButton(yellowCandyToolbutton, Tools.candy_yellow);
+
+        // Setup the orange candy toolbar button
+        ToolbarButton orangeCandyToolbutton = root.Q<ToolbarButton>("tool-candy-orange");
+        SetupToolButton(orangeCandyToolbutton, Tools.candy_orange);
 
 
         // toggle autosave, and save if it's toggled on
@@ -155,6 +162,39 @@ public class LevelEditorWindow : EditorWindow
         root.Q<Button>("save-button").clickable.clicked += () => Save();
     }
 
+
+    /// <summary>
+    /// Sets up a "homemade" toggle button in the toolbar. 
+    /// <para>
+    /// sets the "inactive" class on all the toolbar's buttons, and sets the given tool as the active one if it isn't active, otherwise sets the active tool to none
+    /// </para>
+    /// </summary> 
+    void SetupToolButton(ToolbarButton button, Tools tool)
+    {
+        button.clickable.clicked += () =>
+        {
+            Toolbar toolbar = rootVisualElement.Q<Toolbar>("toolbar");
+            foreach (VisualElement e in toolbar.Children())
+            {
+                e.RemoveFromClassList("tool-active");
+                e.AddToClassList("tool-inactive");
+            }
+
+            if (activeTool != tool)
+            {
+                button.AddToClassList("tool-active");
+                button.RemoveFromClassList("tool-inactive");
+                activeTool = tool;
+            }
+            else
+            {
+                activeTool = Tools.none;
+            }
+        };
+    }
+    #endregion
+
+    #region Grid Setup, loading and saving
     /// <summary>
     /// Creates a new grid of empty EditableGridCell instances. Does not load values from serializedLevel.
     /// </summary>
@@ -251,10 +291,43 @@ public class LevelEditorWindow : EditorWindow
                     VisualElement bg = cell.Q<VisualElement>("Cell");
                     bg.style.visibility = Visibility.Hidden;
                 }
+
+                VisualElement cellBackground = cell.Q<VisualElement>("Cell");
+
+                RemoveCandyClassesFromCell(cellBackground);
+
+                switch (grid[i, j].content)
+                {
+                    case LevelEditorCellContent.random:
+                        cellBackground.AddToClassList("empty");
+                        break;
+
+                    case LevelEditorCellContent.candy_blue:
+                        cellBackground.AddToClassList("candy-blue");
+                        break;
+
+                    case LevelEditorCellContent.candy_red:
+                        cellBackground.AddToClassList("candy-red");
+                        break;
+
+                    case LevelEditorCellContent.candy_green:
+                        cellBackground.AddToClassList("candy-green");
+                        break;
+
+                    case LevelEditorCellContent.candy_orange:
+                        cellBackground.AddToClassList("candy-orange");
+                        break;
+
+                    case LevelEditorCellContent.candy_yellow:
+                        cellBackground.AddToClassList("candy-yellow");
+                        break;
+                }
             }
             cellContainer.Add(row);
         }
     }
+
+
 
     /// <summary>
     /// Apply the editor's state and data to the serializedLevel and save it.
@@ -266,10 +339,14 @@ public class LevelEditorWindow : EditorWindow
         serializedLevel.FindProperty("gridHeight").intValue = gridHeight;
         serializedLevel.FindProperty("levelName").stringValue = name;
 
+        // reset the presetColor_ bools
+        serializedLevel.FindProperty("presetColor_blue").boolValue = false;
+
+
         // get the grid property from the serializedLevel and clear its contents
         SerializedProperty gridProperty = serializedLevel.FindProperty("grid");
         gridProperty.ClearArray();
-        
+
         // fill the serializedLevel's grid with data from the window's grid[,]
         for (int i = 0; i < gridWidth * gridHeight; ++i)
         {
@@ -283,17 +360,53 @@ public class LevelEditorWindow : EditorWindow
 
             serializedCell.FindPropertyRelative("x").intValue = grid[gridX, gridY].x;
             serializedCell.FindPropertyRelative("y").intValue = grid[gridX, gridY].y;
-            
+
             serializedCell.FindPropertyRelative("hole").boolValue = grid[gridX, gridY].hole;
-        
+
             serializedCell.FindPropertyRelative("presetContent").boolValue = grid[gridX, gridY].presetContent;
 
             serializedCell.FindPropertyRelative("content").intValue = (int)grid[gridX, gridY].content;
+
+
+            // if we find a cell that has a preset candy color, we set the corresponding bool on the seriliazedlevel
+            if (grid[gridX, gridY].content != LevelEditorCellContent.random)
+            {
+                switch (grid[gridX, gridY].content)
+                {
+                    case LevelEditorCellContent.candy_blue:
+                        serializedLevel.FindProperty("presetColor_blue").boolValue = true;
+                        break;
+                    case LevelEditorCellContent.candy_red:
+                        break;
+                    case LevelEditorCellContent.candy_green:
+                        break;
+                    case LevelEditorCellContent.candy_orange:
+                        break;
+                    case LevelEditorCellContent.candy_yellow:
+                        break;
+                }
+
+                // add the GridManager.CellContent to the array
+                if (!presetColorsList.Contains(grid[gridX, gridY].content)) 
+                    presetColorsList.Add(grid[gridX, gridY].content);
+            }
+
+        }
+
+        SerializedProperty presetColorsArray = serializedLevel.FindProperty("presetColors");
+        presetColorsArray.ClearArray();
+
+        for (int i = 0; i < presetColorsList.Count; ++i)
+        {
+            presetColorsArray.InsertArrayElementAtIndex(i);
+            presetColorsArray.GetArrayElementAtIndex(i).intValue = (int)presetColorsList[i];
         }
 
         // apply the modified properties to the original SerializedObject
         serializedLevel.ApplyModifiedProperties();
     }
+    #endregion
+
 
     /// <summary>
     /// Callback registered on MouseDownEvent on every cell of the grid.
@@ -310,27 +423,133 @@ public class LevelEditorWindow : EditorWindow
         int x = int.Parse(cell.name.Split(' ')[0]);
         int y = int.Parse(cell.name.Split(' ')[1]);
 
+        
+
         // if the click was a left click
         if (evt.button == 0) 
         {
-            switch (activeTool)
+            // if the clicked cell is a hole, we can only interact with it if the active tool is the hole tool
+            if (grid[x, y].hole)
             {
-                case Tools.none:
-                    break;
-
-                case Tools.hole: // toggle cell visibility
+                if (activeTool == Tools.hole)
+                {
                     VisualElement bg = cell.Q<VisualElement>("Cell");
                     bg.style.visibility = bg.style.visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
 
                     grid[x, y].hole = (bg.style.visibility == Visibility.Hidden);
-                    break;
-
-                case Tools.reset:
-                    break;
-
-                case Tools.candy_blue:
-                    break;
+                }
             }
+            else
+            {
+
+                VisualElement cellBackground = cell.Q<VisualElement>("Cell");
+
+                switch (activeTool)
+                {
+                    case Tools.none:
+                        break;
+
+                    case Tools.hole: // toggle cell visibility
+                        cellBackground.style.visibility = cellBackground.style.visibility == Visibility.Hidden ? Visibility.Visible : Visibility.Hidden;
+
+                        grid[x, y].hole = (cellBackground.style.visibility == Visibility.Hidden);
+                        break;
+
+                    case Tools.reset:
+                        break;
+
+                    // toggle between "empty" and "candy-blue" classes on cell
+                    case Tools.candy_blue:
+                        if (!cellBackground.ClassListContains("candy-blue"))
+                        {
+                            RemoveCandyClassesFromCell(cellBackground);
+
+                            cellBackground.AddToClassList("candy-blue");
+                            grid[x, y].content = LevelEditorCellContent.candy_blue;
+                        }
+                        else
+                        {
+                            cellBackground.RemoveFromClassList("candy-blue");
+
+                            cellBackground.AddToClassList("empty");
+                            grid[x, y].content = LevelEditorCellContent.random;
+                        }
+                        break;
+
+                    // toggle between "empty" and "candy-red" classes on cell
+                    case Tools.candy_red:
+                        if (!cellBackground.ClassListContains("candy-red"))
+                        {
+                            RemoveCandyClassesFromCell(cellBackground);
+
+                            cellBackground.AddToClassList("candy-red");
+                            grid[x, y].content = LevelEditorCellContent.candy_red;
+                        }
+                        else
+                        {
+                            cellBackground.RemoveFromClassList("candy-red");
+
+                            cellBackground.AddToClassList("empty");
+                            grid[x, y].content = LevelEditorCellContent.random;
+                        }
+                        break;
+
+                    // toggle between "empty" and "candy-red" classes on cell
+                    case Tools.candy_green:
+                        if (!cellBackground.ClassListContains("candy-green"))
+                        {
+                            RemoveCandyClassesFromCell(cellBackground);
+
+                            cellBackground.AddToClassList("candy-green");
+                            grid[x, y].content = LevelEditorCellContent.candy_green;
+                        }
+                        else
+                        {
+                            cellBackground.RemoveFromClassList("candy-green");
+
+                            cellBackground.AddToClassList("empty");
+                            grid[x, y].content = LevelEditorCellContent.random;
+                        }
+                        break;
+
+                    // toggle between "empty" and "candy-red" classes on cell
+                    case Tools.candy_yellow:
+                        if (!cellBackground.ClassListContains("candy-yellow"))
+                        {
+                            RemoveCandyClassesFromCell(cellBackground);
+
+                            cellBackground.AddToClassList("candy-yellow");
+                            grid[x, y].content = LevelEditorCellContent.candy_yellow;
+                        }
+                        else
+                        {
+                            cellBackground.RemoveFromClassList("candy-yellow");
+
+                            cellBackground.AddToClassList("empty");
+                            grid[x, y].content = LevelEditorCellContent.random;
+                        }
+                        break;
+
+                    // toggle between "empty" and "candy-red" classes on cell
+                    case Tools.candy_orange:
+                        if (!cellBackground.ClassListContains("candy-orange"))
+                        {
+                            RemoveCandyClassesFromCell(cellBackground);
+
+                            cellBackground.AddToClassList("candy-orange");
+                            grid[x, y].content = LevelEditorCellContent.candy_orange;
+                        }
+                        else
+                        {
+                            cellBackground.RemoveFromClassList("candy-orange");
+
+                            cellBackground.AddToClassList("empty");
+                            grid[x, y].content = LevelEditorCellContent.random;
+                        }
+                        break;
+                }
+            }
+
         }
 
         if (autosave) Save();
@@ -338,6 +557,22 @@ public class LevelEditorWindow : EditorWindow
 
 
 
+    /// <summary>
+    /// Removes all candy-related uss classes from the given cell Visual Element
+    /// </summary>
+    /// <param name="cell"></param>
+    void RemoveCandyClassesFromCell(VisualElement cell)
+    {
+        cell.RemoveFromClassList("candy-blue");
+        cell.RemoveFromClassList("candy-red");
+        cell.RemoveFromClassList("candy-green");
+        cell.RemoveFromClassList("candy-yellow");
+        cell.RemoveFromClassList("candy-orange");
+        cell.RemoveFromClassList("empty");
+    }
+    
+    
+    
     struct EditableGridCell
     {
         public int x, y;
@@ -358,5 +593,4 @@ public class LevelEditorWindow : EditorWindow
         candy_orange = 4,
         candy_yellow = 5
     }
-
 }
