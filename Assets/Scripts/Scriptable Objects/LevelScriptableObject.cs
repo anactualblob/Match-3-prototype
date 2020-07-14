@@ -20,10 +20,10 @@ public class LevelScriptableObject : ScriptableObject
     {
         GridManager.CellContents val = 0;
 
-        if (presetColors.Length == 0) throw new System.Exception();
 
         // if all the colors are preset we just return a random value because the loop below would be infinite
-        if (presetColors.Length >= 5) return (GridManager.CellContents)Random.Range(1, 6);
+        // we also return a basic random number is there are not preset colors
+        if (presetColors.Length >= 5 || presetColors.Length == 0) return (GridManager.CellContents)Random.Range(1, 6);
 
         do
         {
