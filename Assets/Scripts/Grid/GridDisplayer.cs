@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class GridDisplayer : MonoBehaviour
@@ -82,14 +81,17 @@ public class GridDisplayer : MonoBehaviour
         //if (spawnableGridElements == null) Debug.LogError("GridManager.cs : The spawnableGridElements scriptable object is null. Has it been assigned in the inspector?");
 
         // Object Pools initialization
-        numberOfPooledCandies = Mathf.RoundToInt((GridManager.GRID_HEIGHT * GridManager.GRID_WIDTH) * totalCellsToPoolCandiesRatio);
+        //InitializeCandyPools(100);
 
+    }
+
+    private void InitializeCandyPools(int nbCandies)
+    {
         redCandyPool = new CandyPool(candyRed, numberOfPooledCandies, poolContainer);
         blueCandyPool = new CandyPool(candyBlue, numberOfPooledCandies, poolContainer);
         orangeCandyPool = new CandyPool(candyOrange, numberOfPooledCandies, poolContainer);
         greenCandyPool = new CandyPool(candyGreen, numberOfPooledCandies, poolContainer);
         yellowCandyPool = new CandyPool(candyYellow, numberOfPooledCandies, poolContainer);
-
     }
 
     private void Start()
@@ -138,6 +140,8 @@ public class GridDisplayer : MonoBehaviour
         newCandy.transform.rotation = Quaternion.identity;
 
         GridElement_Candy gridElementComponent = newCandy.GetComponent<GridElement_Candy>();
+
+        Debug.Log(gridElementComponent.registered + " --- x: " + gridElementComponent.x + " - y: " + gridElementComponent.y);
 
         // wire the GridElement methods to the GridCell delegates
         gridElementComponent.RegisterMethodsOnCell(gridPosition);
@@ -191,6 +195,11 @@ public class GridDisplayer : MonoBehaviour
     #region Gird Display Initialization & Teardown
     void GridDisplayInit()
     {
+        numberOfPooledCandies = Mathf.RoundToInt((GridManager.GRID_HEIGHT * GridManager.GRID_WIDTH) * totalCellsToPoolCandiesRatio);
+
+        InitializeCandyPools(numberOfPooledCandies);
+
+
         float hCellSize = (gridBackgroundSprite.size.x - (horizontalMargin * 2)) / GridManager.GRID_WIDTH;
         float vCellSize = (gridBackgroundSprite.size.y - (verticalMargin * 2)) / GridManager.GRID_HEIGHT;
 
@@ -356,6 +365,7 @@ public class GridDisplayer : MonoBehaviour
             GameObject current;
             for (int i = 0; i < numberOfPooledObjects; ++i)
             {
+                current = null;
                 current = Instantiate(objectToPool, Vector3.zero, Quaternion.identity);
                 current.transform.SetParent(container);
 

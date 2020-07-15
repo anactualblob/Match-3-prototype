@@ -46,7 +46,7 @@ public class GridElement_Candy : GridElement
 
     bool sequenceDirty = false;
     bool wasSwapped = false;
-    bool registered = false;
+    public bool registered = false;
 
     
     public enum CandyColor
@@ -193,7 +193,7 @@ public class GridElement_Candy : GridElement
     {
         // need to check if this isn't null because the GameObjects are disabled before the grid 
         //   is created, since object pools are created in awake and the grid is setup in start
-        if (GridManager.GRID != null)
+        if (GridManager.GRID != null && registered)
         {
             DeRegisterMethodsFromCell(x, y);
         }

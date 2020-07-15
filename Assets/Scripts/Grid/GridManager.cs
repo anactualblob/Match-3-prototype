@@ -35,6 +35,14 @@ public class GridManager : MonoBehaviour
     bool shouldGetSwipedCell = false;
     //bool swipeHappenedThisTouch = false;
 
+
+    public static bool LevelLoaded
+    {
+        get
+        {
+            return !(S.level == null);
+        }
+    }
     
     GridCell[,] grid;
     public static GridCell[,] GRID
@@ -249,51 +257,61 @@ public class GridManager : MonoBehaviour
                 }
             }
 
-
-            ////for each grid column i, check if grid[i, 0] is empty. if yes, new candies should be spawned.
-            //for (int i = GRID_WIDTH - 1; i >= 0; --i)
-            //{
-            //    if (grid[i, 0].cellContent == CellContents.empty)
-            //    {
-            //        // "probe" down to see how far down the next non-empty cell is
-            //        // Call a GridDisplayer Function to spawn in a new candy in the top row cell
-            //        // call Fall on this top row cell if the distance to the non-emtpy cell is > 0
-            //        int dist = 0;
-            //
-            //        for (int j = 1; j < GRID_WIDTH; ++j)
-            //        {
-            //            if (grid[i, j].cellContent == CellContents.empty)
-            //            {
-            //                ++dist;
-            //            }
-            //            else
-            //            {
-            //                break;
-            //            }
-            //        }
-            //
-            //        // get a random color for the new candy
-            //        // FIND A BETTER WAY TO DO THIS
-            //        CellContents color = (CellContents)Random.Range(1, 6);
-            //
-            //        GridDisplayer.SpawnNewCandy(color, new Vector2Int(i, 0));
-            //
-            //        if (dist > 0)
-            //        {
-            //            if (grid[i, 0].Fall != null) 
-            //                grid[i, 0].Fall(dist);
-            //
-            //            grid[i, dist].cellContent = color;
-            //        }
-            //        else
-            //        {
-            //            grid[i, 0].cellContent = color;
-            //        }
-            //        
-            //    }
-            //}
-
             if (candiesFellThisFrame) return;
+
+
+            //for each grid column i, check if grid[i, 0] is empty. if yes, new candies should be spawned.
+            for (int i = GRID_WIDTH - 1; i >= 0; --i)
+            {
+                int topColumnCellYCoord = 0;
+
+                // if the top cell of the column is a hole, go down until we find one that's not
+                if (grid[i, topColumnCellYCoord].cellContent == CellContents.hole)
+                {
+                    // todo
+                }
+
+                if (grid[i, topColumnCellYCoord].cellContent == CellContents.empty)
+                {
+                    // "probe" down to see how far down the next non-empty cell is
+                    // Call a GridDisplayer Function to spawn in a new candy in the top row cell
+                    // call Fall on this top row cell if the distance to the non-emtpy cell is > 0
+                    int dist = 0;
+            
+                    for (int j = 1; j < GRID_WIDTH; ++j)
+                    {
+                        if (grid[i, j].cellContent == CellContents.empty)
+                        {
+                            ++dist;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+            
+                    // get a random color for the new candy
+                    // FIND A BETTER WAY TO DO THIS
+                    CellContents color = (CellContents)Random.Range(1, 6);
+            
+                    GridDisplayer.SpawnNewCandy(color, new Vector2Int(i, 0));
+            
+                    if (dist > 0)
+                    {
+                        if (grid[i, 0].Fall != null) 
+                            grid[i, 0].Fall(dist);
+            
+                        grid[i, dist].cellContent = color;
+                    }
+                    else
+                    {
+                        grid[i, 0].cellContent = color;
+                    }
+                    
+                }
+            }
+
+            
 
         }
         #endregion
