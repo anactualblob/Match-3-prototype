@@ -35,6 +35,7 @@ public class GridElement_Candy : GridElement
                 {
                     GridDisplayer.NotifyTweenEnd(this);
                     wasSwapped = false;
+                    returningToPool = false;
                     sequenceDirty = true;
                 });
             }
@@ -45,10 +46,15 @@ public class GridElement_Candy : GridElement
 
 
     bool sequenceDirty = false;
+
+
     bool wasSwapped = false;
-    public bool registered = false;
+    bool returningToPool = false;
 
     
+    public bool registered = false;
+
+
     public enum CandyColor
     {
         red,
@@ -58,15 +64,12 @@ public class GridElement_Candy : GridElement
         orange
     }
     public CandyColor color;
-
-
-
+    
 
     private void Start()
     {
         DOTween.Init();
     }
-
 
 
 
@@ -112,7 +115,13 @@ public class GridElement_Candy : GridElement
             MasterSequence.AppendInterval(swapTweenDuration);
 
         MasterSequence.Append( transform.DOScale(0, popTweenDuration).SetEase(Ease.InBack) );
-        MasterSequence.AppendCallback(() => GridDisplayer.ReturnCandyToPool(this)) ;
+
+        if (!returningToPool)
+        {
+            MasterSequence.AppendCallback(() => GridDisplayer.ReturnCandyToPool(this));
+            returningToPool = true;
+        }
+        
 
         // scale the game object back to 1 after returning it so that it's scaled properly when we get it back from the pool again
         MasterSequence.AppendCallback( () => transform.localScale = new Vector3(1, 1, 1));

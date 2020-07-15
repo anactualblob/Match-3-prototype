@@ -141,8 +141,6 @@ public class GridDisplayer : MonoBehaviour
 
         GridElement_Candy gridElementComponent = newCandy.GetComponent<GridElement_Candy>();
 
-        Debug.Log(gridElementComponent.registered + " --- x: " + gridElementComponent.x + " - y: " + gridElementComponent.y);
-
         // wire the GridElement methods to the GridCell delegates
         gridElementComponent.RegisterMethodsOnCell(gridPosition);
 
@@ -346,8 +344,12 @@ public class GridDisplayer : MonoBehaviour
     #region Candy Object Pool
     class CandyPool
     {
-        GameObject[] pool;
-        int index;
+        //GameObject[] pool;
+        //int index;
+
+        //List<GameObject> inactive = new List<GameObject>();
+        List<GameObject> activeList = new List<GameObject>();
+        Stack<GameObject> inactiveStack = new Stack<GameObject>();
 
         Transform container;
 
@@ -359,7 +361,7 @@ public class GridDisplayer : MonoBehaviour
         /// <param name="numberOfPooledObjects"></param>
         public CandyPool(GameObject objectToPool, int numberOfPooledObjects, Transform objectsContainer = null)
         {
-            pool = new GameObject[numberOfPooledObjects];
+            //pool = new GameObject[numberOfPooledObjects];
             container = objectsContainer;
 
             GameObject current;
@@ -371,11 +373,12 @@ public class GridDisplayer : MonoBehaviour
 
                 current.SetActive(false);
 
-                pool[i] = current;
+                //pool[i] = current;
+                inactiveStack.Push(current);
             }
 
 
-            index = 0;
+            //index = 0;
         }
 
         /// <summary>
@@ -386,14 +389,18 @@ public class GridDisplayer : MonoBehaviour
         /// <returns>A GameObject from the pool, or null if there are none available.</returns>
         public GameObject TakeFromPool(bool activate = true, Transform parent = null)
         {
-            if (index >= pool.Length)
+            if (/*index >= pool.Length*/ inactiveStack.Count <= 0)
             {
                 Debug.LogError("CandyPool : Trying to get a new object from pool but there is no more.");
                 return null;
             }
 
-            GameObject ret = pool[index];
-            ++index;
+            //GameObject ret = pool[index];
+            //++index;
+
+            GameObject ret = inactiveStack.Pop();
+            activeList.Add(ret);
+
 
             if (ret == null)
             {
@@ -414,7 +421,18 @@ public class GridDisplayer : MonoBehaviour
         /// <param name="returnedObject">The object to return to the pool.</param>
         public void ReturnToPool(GameObject returnedObject)
         {
-            --index;
+            //--index;
+
+            if (!activeList.Contains(returnedObject))
+            {
+                Debug.LogError("GridDisplayer.cs : Couldn't return object to pool because it is not in the active list of this pool.", returnedObject);
+            }
+            else
+            {
+                activeList.Remove(returnedObject);
+            }
+
+            inactiveStack.Push(returnedObject);
 
             returnedObject.SetActive(false);
             returnedObject.transform.parent = container;

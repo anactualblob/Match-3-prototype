@@ -65,7 +65,7 @@ MonoBehaviour:
     y: 9
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 1
     y: 0
     hole: 0
@@ -95,7 +95,7 @@ MonoBehaviour:
     y: 5
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 1
     y: 6
     hole: 0
@@ -110,7 +110,7 @@ MonoBehaviour:
     y: 8
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 1
     y: 9
     hole: 0
@@ -123,29 +123,29 @@ MonoBehaviour:
     content: 0
   - x: 2
     y: 1
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 2
     y: 2
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 2
   - x: 2
     y: 3
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 2
     y: 4
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 2
     y: 5
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 1
   - x: 2
     y: 6
     hole: 0
@@ -160,7 +160,7 @@ MonoBehaviour:
     y: 8
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 2
     y: 9
     hole: 1
@@ -170,52 +170,52 @@ MonoBehaviour:
     y: 0
     hole: 1
     presetContent: 0
-    content: 0
+    content: 2
   - x: 3
     y: 1
     hole: 1
     presetContent: 0
-    content: 0
+    content: 2
   - x: 3
     y: 2
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 3
     y: 3
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 2
   - x: 3
     y: 4
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 2
   - x: 3
     y: 5
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 3
     y: 6
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 3
     y: 7
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 3
     y: 8
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 3
     y: 9
     hole: 1
     presetContent: 0
-    content: 0
+    content: 1
   - x: 4
     y: 0
     hole: 1
@@ -230,22 +230,22 @@ MonoBehaviour:
     y: 2
     hole: 1
     presetContent: 0
-    content: 0
+    content: 2
   - x: 4
     y: 3
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 4
     y: 4
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 4
     y: 5
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 1
   - x: 4
     y: 6
     hole: 0
@@ -253,14 +253,14 @@ MonoBehaviour:
     content: 0
   - x: 4
     y: 7
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 4
     y: 8
-    hole: 1
+    hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 4
     y: 9
     hole: 1
@@ -280,22 +280,22 @@ MonoBehaviour:
     y: 2
     hole: 1
     presetContent: 0
-    content: 0
+    content: 2
   - x: 5
     y: 3
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 5
     y: 4
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 5
     y: 5
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 1
   - x: 5
     y: 6
     hole: 0
@@ -303,14 +303,14 @@ MonoBehaviour:
     content: 0
   - x: 5
     y: 7
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 5
     y: 8
-    hole: 1
+    hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 5
     y: 9
     hole: 1
@@ -328,44 +328,44 @@ MonoBehaviour:
     content: 0
   - x: 6
     y: 2
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 6
     y: 3
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 6
     y: 4
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 6
     y: 5
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 6
     y: 6
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 6
     y: 7
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 6
     y: 8
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 6
     y: 9
     hole: 1
     presetContent: 0
-    content: 0
+    content: 1
   - x: 7
     y: 0
     hole: 1
@@ -373,29 +373,29 @@ MonoBehaviour:
     content: 0
   - x: 7
     y: 1
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 7
     y: 2
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 1
   - x: 7
     y: 3
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 7
     y: 4
-    hole: 0
+    hole: 1
     presetContent: 0
     content: 0
   - x: 7
     y: 5
-    hole: 0
+    hole: 1
     presetContent: 0
-    content: 0
+    content: 1
   - x: 7
     y: 6
     hole: 0
@@ -410,7 +410,7 @@ MonoBehaviour:
     y: 8
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 7
     y: 9
     hole: 1
@@ -445,7 +445,7 @@ MonoBehaviour:
     y: 5
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 8
     y: 6
     hole: 0
@@ -460,7 +460,7 @@ MonoBehaviour:
     y: 8
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 8
     y: 9
     hole: 0
@@ -500,12 +500,12 @@ MonoBehaviour:
     y: 6
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 9
     y: 7
     hole: 0
     presetContent: 0
-    content: 0
+    content: 1
   - x: 9
     y: 8
     hole: 0
@@ -515,6 +515,6 @@ MonoBehaviour:
     y: 9
     hole: 0
     presetContent: 0
-    content: 0
-  presetColor_blue: 0
-  presetColors: 
+    content: 1
+  presetColor_blue: 1
+  presetColors: 0100000002000000

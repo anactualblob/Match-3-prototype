@@ -191,6 +191,40 @@ public class GridManager : MonoBehaviour
         #region Candy Falling
         if ( GridHasEmptyCells() )
         {
+            // check for cells i which new candies should be spawned
+            for (int i = GRID_WIDTH - 1; i >= 0; --i)
+            {
+                int topColumnCellYCoord = 0;
+
+                // if the top cell of the column is a hole, go down until we find one that's not
+                if (grid[i, topColumnCellYCoord].cellContent == CellContents.hole)
+                {
+                    for (int j = 0; j < GRID_HEIGHT; ++j)
+                    {
+                        if (grid[i, j].cellContent == CellContents.hole)
+                        {
+                            ++topColumnCellYCoord;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (grid[i, topColumnCellYCoord].cellContent == CellContents.empty)
+                {
+                    // get a random color for the new candy
+                    // FIND A BETTER WAY TO DO THIS
+                    CellContents color = (CellContents)Random.Range(1, 6);
+                    
+                    // Call a GridDisplayer Function to spawn in a new candy in the top row cell
+                    GridDisplayer.SpawnNewCandy(color, new Vector2Int(i, topColumnCellYCoord));
+
+                    grid[i, topColumnCellYCoord].cellContent = color;
+                }
+            }
+
             bool candiesFellThisFrame = false;
 
             // go backwards throught the grid, starting 1 line above the bottom because we're checking if cells below are emtpy
@@ -261,78 +295,101 @@ public class GridManager : MonoBehaviour
 
 
             //for each grid column i, check if grid[i, 0] is empty. if yes, new candies should be spawned.
-            for (int i = GRID_WIDTH - 1; i >= 0; --i)
-            {
-                int topColumnCellYCoord = 0;
-
-                // if the top cell of the column is a hole, go down until we find one that's not
-                if (grid[i, topColumnCellYCoord].cellContent == CellContents.hole)
-                {
-                    // todo
-                }
-
-                if (grid[i, topColumnCellYCoord].cellContent == CellContents.empty)
-                {
-                    // "probe" down to see how far down the next non-empty cell is
-                    // Call a GridDisplayer Function to spawn in a new candy in the top row cell
-                    // call Fall on this top row cell if the distance to the non-emtpy cell is > 0
-                    int dist = 0;
-            
-                    for (int j = 1; j < GRID_WIDTH; ++j)
-                    {
-                        if (grid[i, j].cellContent == CellContents.empty)
-                        {
-                            ++dist;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-            
-                    // get a random color for the new candy
-                    // FIND A BETTER WAY TO DO THIS
-                    CellContents color = (CellContents)Random.Range(1, 6);
-            
-                    GridDisplayer.SpawnNewCandy(color, new Vector2Int(i, 0));
-            
-                    if (dist > 0)
-                    {
-                        if (grid[i, 0].Fall != null) 
-                            grid[i, 0].Fall(dist);
-            
-                        grid[i, dist].cellContent = color;
-                    }
-                    else
-                    {
-                        grid[i, 0].cellContent = color;
-                    }
-                    
-                }
-            }
+            //for (int i = GRID_WIDTH - 1; i >= 0; --i)
+            //{
+            //    int topColumnCellYCoord = 0;
+            //
+            //    // if the top cell of the column is a hole, go down until we find one that's not
+            //    if (grid[i, topColumnCellYCoord].cellContent == CellContents.hole)
+            //    {
+            //        for (int j = 0; j < GRID_HEIGHT; ++j)
+            //        {
+            //            if (grid[i, j].cellContent == CellContents.hole)
+            //            {
+            //                ++topColumnCellYCoord;
+            //            }
+            //            else
+            //            {
+            //                break;
+            //            }
+            //        }
+            //    }
+            //
+            //    if (grid[i, topColumnCellYCoord].cellContent == CellContents.empty)
+            //    {
+            //        // "probe" down to see how far down the next non-empty cell is
+            //        int dist = 0;
+            //        int holeCounter = 0;
+            //
+            //        for (int j = topColumnCellYCoord+1; j < GRID_WIDTH; ++j)
+            //        {
+            //            if (grid[i, j].cellContent == CellContents.empty )
+            //            {
+            //                ++dist;
+            //
+            //                if (holeCounter > 0)
+            //                {
+            //                    dist += holeCounter;
+            //                    holeCounter = 0;
+            //                }
+            //            }
+            //            else if (grid[i, j].cellContent == CellContents.hole)
+            //            {
+            //                ++holeCounter;
+            //            }
+            //            else
+            //            {
+            //                break;
+            //            }
+            //        }
+            //
+            //        // get a random color for the new candy
+            //        // FIND A BETTER WAY TO DO THIS
+            //        CellContents color = (CellContents)Random.Range(1, 6);
+            //
+            //        // Call a GridDisplayer Function to spawn in a new candy in the top row cell
+            //        GridDisplayer.SpawnNewCandy(color, new Vector2Int(i, topColumnCellYCoord));
+            //
+            //        // call Fall on this top row cell if dist > 0
+            //        if (dist > 0)
+            //        {
+            //            if (grid[i, 0].Fall != null) 
+            //                grid[i, 0].Fall(dist);
+            //
+            //            grid[i, dist].cellContent = color;
+            //        }
+            //        else
+            //        {
+            //            grid[i, 0].cellContent = color;
+            //        }
+            //        
+            //    }
+            //}
 
             
 
         }
         #endregion
 
-        // check the whole grid for matches and pop them
-        // for some reason this doesn't detect 4+ matches sometimes ?
-        for (int i = 0; i < GRID_WIDTH; ++i)
+        if (!GridHasEmptyCells())
         {
-            for (int j = 0; j < GRID_HEIGHT; ++j)
+            // check the whole grid for matches and pop them
+            // for some reason this doesn't detect 4+ matches sometimes ?
+            for (int i = 0; i < GRID_WIDTH; ++i)
             {
-                foreach (Vector2Int cellPos in GetMatchesAtCell(new Vector2Int(i, j)))
+                for (int j = 0; j < GRID_HEIGHT; ++j)
                 {
-                    if (grid[cellPos.x, cellPos.y].Pop != null)
+                    foreach (Vector2Int cellPos in GetMatchesAtCell(new Vector2Int(i, j)))
                     {
-                        grid[cellPos.x, cellPos.y].Pop();
+                        if (grid[cellPos.x, cellPos.y].Pop != null)
+                        {
+                            grid[cellPos.x, cellPos.y].Pop();
+                        }
+                        grid[cellPos.x, cellPos.y].cellContent = CellContents.empty;
                     }
-                    grid[cellPos.x, cellPos.y].cellContent = CellContents.empty;
                 }
             }
         }
-
     }
 
 
