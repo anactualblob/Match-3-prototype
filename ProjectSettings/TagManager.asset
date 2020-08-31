@@ -50,3 +50,6 @@ TagManager:
   - name: Grid Elements
     uniqueID: 2070021349
     locked: 0
+  - name: Effects
+    uniqueID: 199075633
+    locked: 0

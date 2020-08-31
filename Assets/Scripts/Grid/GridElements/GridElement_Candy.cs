@@ -11,6 +11,8 @@ public class GridElement_Candy : GridElement
 
     Sequence _masterSequence = null;
 
+    ParticleSystem popParticleSystem;
+
     /// <summary>
     /// Property that wraps _masterSequence, setting it to a new sequence if it is null or marked as dirty.
     /// <para>
@@ -69,6 +71,9 @@ public class GridElement_Candy : GridElement
     private void Start()
     {
         DOTween.Init();
+
+        popParticleSystem = transform.Find("ParticleSystem_Pop").GetComponentInChildren<ParticleSystem>();
+        if (popParticleSystem == null) Debug.LogError("GridElement_Candy.cs : Couldn't find the pop particle system in children of this object.", this);
     }
 
 
@@ -104,17 +109,15 @@ public class GridElement_Candy : GridElement
 
     public override void OnPop()
     {
-        // spawn particles ?
-        // sound effects ?
-        // etc.
-
 
         // if this cell is part of a match but isn't the one that was swapped this frame, it 
         //    needs to wait for the swap tween to end before disappearing
         if (!wasSwapped)
             MasterSequence.AppendInterval(swapTweenDuration);
 
-        MasterSequence.Append( transform.DOScale(0, popTweenDuration).SetEase(Ease.InBack) );
+        MasterSequence.AppendCallback( () => popParticleSystem.Play() );
+
+        MasterSequence.Append(transform.DOScale(0, popTweenDuration).SetEase(Ease.InBack));
 
         if (!returningToPool)
         {

@@ -194,6 +194,8 @@ public class LevelEditorWindow : EditorWindow
     }
     #endregion
 
+
+
     #region Grid Setup, loading and saving
     /// <summary>
     /// Creates a new grid of empty EditableGridCell instances. Does not load values from serializedLevel.

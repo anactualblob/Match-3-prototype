@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33aa966adca82554489dfc4314c7db01, type: 3}
   m_Name: Level
   m_EditorClassIdentifier: 
-  gridHeight: 10
-  gridWidth: 10
+  gridHeight: 5
+  gridWidth: 5
   levelName: test
   grid:
   - x: 0
@@ -41,31 +41,6 @@ MonoBehaviour:
     hole: 0
     presetContent: 0
     content: 0
-  - x: 0
-    y: 5
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 0
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 0
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 0
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 0
-    y: 9
-    hole: 0
-    presetContent: 0
-    content: 1
   - x: 1
     y: 0
     hole: 0
@@ -91,430 +66,80 @@ MonoBehaviour:
     hole: 0
     presetContent: 0
     content: 0
-  - x: 1
-    y: 5
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 1
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 1
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 1
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 1
-    y: 9
-    hole: 0
-    presetContent: 0
-    content: 0
   - x: 2
     y: 0
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 2
     y: 1
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 2
     y: 2
-    hole: 1
+    hole: 0
     presetContent: 0
-    content: 2
+    content: 0
   - x: 2
     y: 3
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 2
     y: 4
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 2
-    y: 5
-    hole: 1
-    presetContent: 0
-    content: 1
-  - x: 2
-    y: 6
     hole: 0
-    presetContent: 0
-    content: 0
-  - x: 2
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 2
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 2
-    y: 9
-    hole: 1
     presetContent: 0
     content: 0
   - x: 3
     y: 0
-    hole: 1
+    hole: 0
     presetContent: 0
-    content: 2
+    content: 0
   - x: 3
     y: 1
-    hole: 1
+    hole: 0
     presetContent: 0
-    content: 2
+    content: 0
   - x: 3
     y: 2
-    hole: 1
+    hole: 0
     presetContent: 0
     content: 0
   - x: 3
     y: 3
-    hole: 1
+    hole: 0
     presetContent: 0
-    content: 2
+    content: 0
   - x: 3
     y: 4
-    hole: 1
-    presetContent: 0
-    content: 2
-  - x: 3
-    y: 5
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 3
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 3
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 3
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 3
-    y: 9
-    hole: 1
-    presetContent: 0
-    content: 1
-  - x: 4
-    y: 0
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 4
-    y: 1
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 4
-    y: 2
-    hole: 1
-    presetContent: 0
-    content: 2
-  - x: 4
-    y: 3
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 4
-    y: 4
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 4
-    y: 5
-    hole: 1
-    presetContent: 0
-    content: 1
-  - x: 4
-    y: 6
     hole: 0
     presetContent: 0
     content: 0
   - x: 4
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 4
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 4
-    y: 9
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 5
-    y: 0
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 5
-    y: 1
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 5
-    y: 2
-    hole: 1
-    presetContent: 0
-    content: 2
-  - x: 5
-    y: 3
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 5
-    y: 4
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 5
-    y: 5
-    hole: 1
-    presetContent: 0
-    content: 1
-  - x: 5
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 5
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 5
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 5
-    y: 9
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 0
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 1
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 2
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 3
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 4
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 5
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 6
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 6
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 6
-    y: 9
-    hole: 1
-    presetContent: 0
-    content: 1
-  - x: 7
-    y: 0
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 7
-    y: 1
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 7
-    y: 2
-    hole: 1
-    presetContent: 0
-    content: 1
-  - x: 7
-    y: 3
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 7
-    y: 4
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 7
-    y: 5
-    hole: 1
-    presetContent: 0
-    content: 1
-  - x: 7
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 7
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 7
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 7
-    y: 9
-    hole: 1
-    presetContent: 0
-    content: 0
-  - x: 8
     y: 0
     hole: 0
     presetContent: 0
     content: 0
-  - x: 8
+  - x: 4
     y: 1
     hole: 0
     presetContent: 0
     content: 0
-  - x: 8
+  - x: 4
     y: 2
     hole: 0
     presetContent: 0
     content: 0
-  - x: 8
+  - x: 4
     y: 3
     hole: 0
     presetContent: 0
     content: 0
-  - x: 8
+  - x: 4
     y: 4
     hole: 0
     presetContent: 0
     content: 0
-  - x: 8
-    y: 5
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 8
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 8
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 8
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 8
-    y: 9
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 0
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 1
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 2
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 3
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 4
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 5
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 6
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 9
-    y: 7
-    hole: 0
-    presetContent: 0
-    content: 1
-  - x: 9
-    y: 8
-    hole: 0
-    presetContent: 0
-    content: 0
-  - x: 9
-    y: 9
-    hole: 0
-    presetContent: 0
-    content: 1
-  presetColor_blue: 1
-  presetColors: 0100000002000000
+  presetColor_blue: 0
+  presetColors: 
